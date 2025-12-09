@@ -1,17 +1,24 @@
-import { ScaleLoader } from 'react-spinners'
+import React from "react";
+import { motion } from "framer-motion";
+import { FaSpinner } from "react-icons/fa";
 
-const LoadingSpinner = ({ smallHeight }) => {
+const LoadingSpinner = () => {
   return (
-    <div
-      className={` ${smallHeight ? 'h-[250px]' : 'h-[70vh]'}
-      flex 
-      flex-col 
-      justify-center 
-      items-center `}
-    >
-      <ScaleLoader size={100} color='lime' />
-    </div>
-  )
-}
+    <div className="min-h-screen flex flex-col items-center justify-center bg-base-200 px-4">
+      
+      {/* Spinner Icon */}
+      <motion.div
+        animate={{ rotate: 360 }}
+        transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
+        className="text-[#1a4dbe] text-6xl mb-6"
+      >
+        <FaSpinner />
+      </motion.div>
 
-export default LoadingSpinner
+    
+
+    </div>
+  );
+};
+
+export default LoadingSpinner;

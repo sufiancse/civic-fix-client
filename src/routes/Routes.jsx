@@ -15,6 +15,8 @@ import MyOrders from "../pages/Dashboard/Customer/MyOrders";
 import { createBrowserRouter } from "react-router";
 import AddIssue from "../pages/Dashboard/Stuff/AddIssue";
 import AllIssues from "../pages/AllIssues/AllIssues";
+import LoadingSpinner from "../components/Shared/LoadingSpinner";
+import IssueDetailsPage from "../pages/IssueDetailsPage/IssueDetailsPage";
 
 export const router = createBrowserRouter([
   {
@@ -32,8 +34,16 @@ export const router = createBrowserRouter([
       },
       {
         path: "/all-issues",
-        element: <AllIssues />
-      }
+        element: <AllIssues />,
+      },
+      {
+        path: "/issue-details/:id",
+        element: <IssueDetailsPage />
+      },
+      {
+        path: "/l",
+        element: <LoadingSpinner />,
+      },
     ],
   },
   { path: "/login", element: <Login /> },
