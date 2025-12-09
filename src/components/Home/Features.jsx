@@ -13,16 +13,6 @@ import Heading from "../Shared/Heading";
 
  import { motion } from "framer-motion";
 
-/**
- * CivicFix Features Component
- * React 19 + Tailwind CSS
- *
- * Usage:
- * import Features from "./components/Features";
- * <Features />
- *
- * Make sure react-icons is installed and Tailwind is configured.
- */
 
 const features = [
   {
