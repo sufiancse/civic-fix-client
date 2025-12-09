@@ -2,14 +2,13 @@ import Card from "./Card";
 import Container from "../Shared/Container";
 import Heading from "../Shared/Heading";
 
-const LatestIssues = () => {
+const LatestResolvedIssues = () => {
   return (
     <Container>
-
-      <Heading 
-      title={"Latest Resolve Issue"}
-      subtitle="This is subtitle"
-      center="true"
+      <Heading
+        title={"Latest Resolve Issue"}
+        subtitle="Check out the most recent issues successfully resolved by our community. Stay updated and see how quickly problems are getting fixed."
+        center="true"
       />
 
       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-2 sm:gap-3 md:gap-5">
@@ -19,10 +18,9 @@ const LatestIssues = () => {
         <Card />
         <Card />
         <Card />
-        
       </div>
     </Container>
   );
 };
 
-export default LatestIssues;
+export default LatestResolvedIssues;
