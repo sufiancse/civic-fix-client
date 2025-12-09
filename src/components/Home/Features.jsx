@@ -11,6 +11,8 @@ import {
 } from "react-icons/fi";
 import Heading from "../Shared/Heading";
 
+ import { motion } from "framer-motion";
+
 /**
  * CivicFix Features Component
  * React 19 + Tailwind CSS
@@ -85,29 +87,40 @@ export default function Features() {
           }
           center="true"
         />
-        
 
         {/* Grid */}
         <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {features.map((f) => {
             const Icon = f.Icon;
             return (
-              <article
+              <motion.article
                 key={f.id}
-                className="group bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200 
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 0.5,
+                  ease: "easeOut",
+                  delay: f.id * 0.08,
+                }}
+                viewport={{ once: true }}
+                whileHover={{ y: -6 }}
+                className="group bg-white border border-gray-200 rounded-xl p-6 shadow-sm
+             hover:shadow-lg transition-all duration-200
              flex flex-col h-full"
                 aria-labelledby={`feature-${f.id}-title`}
               >
                 {/* TOP CONTENT */}
                 <div className="flex items-start gap-4">
                   {/* Icon */}
-                  <div
+                  <motion.div
+                    whileHover={{ scale: 1.08 }}
+                    transition={{ type: "spring", stiffness: 300 }}
                     className="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center"
                     style={{ backgroundColor: "#0B5ED7", color: "#fff" }}
                     aria-hidden="true"
                   >
                     <Icon className="w-6 h-6" />
-                  </div>
+                  </motion.div>
 
                   {/* Title + description */}
                   <div className="min-w-0">
@@ -131,7 +144,7 @@ export default function Features() {
                     Learn more →
                   </span>
                 </div>
-              </article>
+              </motion.article>
             );
           })}
         </div>
