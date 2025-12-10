@@ -12,6 +12,15 @@ import IssueDetailsPage from "../pages/IssueDetailsPage/IssueDetailsPage";
 import AboutUs from "../pages/AboutUs/AboutUs";
 import ContactUs from "../pages/ContactUs/ContactUs";
 import DashboardHome from "../pages/Dashboard/Common/DashboardHome";
+import AllIssuesAdminPage from "../pages/Dashboard/Admin/AllIssuesAdminPage";
+import ManageUsers from "../pages/Dashboard/Admin/ManageUsers";
+import ManageStuff from "../pages/Dashboard/Admin/ManageStuff";
+import ViewPayments from "../pages/Dashboard/Admin/ViewPayments";
+import AssignedIssues from "../pages/Dashboard/Stuff/AssignedIssues";
+import MyIssues from "../pages/Dashboard/Citizen/MyIssues";
+import ReportIssue from "../pages/Dashboard/Citizen/ReportIssue";
+import MyPayments from "../pages/Dashboard/Citizen/MyPayments";
+import Profile from "../pages/Dashboard/Common/Profile";
 
 export const router = createBrowserRouter([
   {
@@ -41,8 +50,8 @@ export const router = createBrowserRouter([
       },
       {
         path: "/contact",
-        element: <ContactUs />
-      }
+        element: <ContactUs />,
+      },
     ],
   },
   { path: "/login", element: <Login /> },
@@ -56,14 +65,55 @@ export const router = createBrowserRouter([
     ),
     children: [
       {
-        index: true,
+        path: "home",
         element: (
           <PrivateRoute>
             <DashboardHome />
           </PrivateRoute>
         ),
       },
-      
+      {
+        path: "profile",
+        element : <Profile />
+      },
+
+      // admin only routes
+      {
+        path: "admin/all-issues",
+        element: <AllIssuesAdminPage />,
+      },
+      {
+        path: "admin/manage-users",
+        element: <ManageUsers />,
+      },
+      {
+        path: "admin/manage-stuff",
+        element: <ManageStuff />,
+      },
+      {
+        path: "admin/view-payments",
+        element: <ViewPayments />,
+      },
+
+      // stuff only routes
+      {
+        path: "stuff/assigned-issues",
+        element: <AssignedIssues />,
+      },
+
+      //users only routes
+      {
+        path: "user/my-issues",
+        element: <MyIssues />,
+      },
+      {
+        path: "user/report-issue",
+        element: <ReportIssue />,
+      },
+      {
+        path: "user/my-payments",
+        element: <MyPayments />,
+      },
     ],
   },
 ]);

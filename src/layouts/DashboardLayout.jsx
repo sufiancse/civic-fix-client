@@ -8,6 +8,7 @@ import SideNav from "../components/Dashboard/SideNav/SideNav";
 const DashboardLayout = () => {
   return (
     <>
+    <title>CivicFix | Dashboard</title>
       <div className="drawer lg:drawer-open arimo">
         <input id="my-drawer-4" type="checkbox" className="drawer-toggle" />
         <div className="drawer-content">

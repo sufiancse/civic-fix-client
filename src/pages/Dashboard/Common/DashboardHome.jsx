@@ -1,10 +1,14 @@
-import React from 'react';
-import AdminStatistics from '../../../components/Dashboard/Statistics/AdminStatistics';
+import AdminDashboard from "../../../components/Dashboard/Shared/AdminDashboard";
+import StuffDashboard from "../../../components/Dashboard/Shared/StuffDashboard";
+import UserDashboard from "../../../components/Dashboard/Shared/UserDashboard";
 
 const DashboardHome = () => {
   return (
     <div>
-      <AdminStatistics />
+   
+      <UserDashboard />
+      <AdminDashboard />
+      <StuffDashboard />
     </div>
   );
 };

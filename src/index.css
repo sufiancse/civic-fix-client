@@ -9,6 +9,8 @@
   --color-accent: "#F5FAFF";
 }
 
-
+.active{
+  @apply text-primary
+}
 
 
