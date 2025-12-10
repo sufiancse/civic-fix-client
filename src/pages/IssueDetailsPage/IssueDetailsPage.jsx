@@ -37,6 +37,7 @@ export default function IssueDetailsPage() {
 
   return (
     <div className="max-w-5xl mx-auto p-4 mt-10">
+      <title>CivicFix | Issue Details</title>
       {/* Issue Card */}
       <motion.div
         className={`rounded-xl overflow-hidden mb-6 shadow-lg ${

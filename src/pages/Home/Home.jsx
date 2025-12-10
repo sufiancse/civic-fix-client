@@ -9,6 +9,7 @@ import FeedbackForm from "../../components/Home/FeedbackForm";
 const Home = () => {
   return (
     <div>
+      <title>CivicFix | Home</title>
       <Hero />
       <LatestResolvedIssues />
       <Features />

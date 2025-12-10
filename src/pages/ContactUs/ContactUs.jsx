@@ -45,27 +45,25 @@ export default function ContactUs() {
 
   return (
     <Container>
-        <title>CivicFix | Contact</title>
+      <title>CivicFix | Contact</title>
       {/* SECTION TITLE */}
 
-      <Heading
-        title="Contact Us"
-        subtitle="Have questions, feedback, or need support? Reach out to us and we’ll
-            get back to you as soon as possible."
+      <div
+        className="text-center pt-12 sm:pt-16 lg:pt-20 mb-8 sm:mb-10 lg:mb-12 max-w-2xl mx-auto"
+      >
+        <h2 className="text-3xl md:text-4xl font-bold text-gray-800">
+          Contact Us
+        </h2>
+        <p className="mt-4 text-gray-600 text-base md:text-lg">
+          Have questions, feedback, or need support? Reach out to us and we’ll
+          get back to you as soon as possible.
+        </p>
+      </div>
 
-            center="true"
-      />
-
-  
       {/* CONTENT */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
         {/* LEFT INFO */}
-        <motion.div
-          initial={{ opacity: 0, x: -40 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6 }}
-          className="space-y-8"
-        >
+        <motion.div className="space-y-8">
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-xl">
               <FaEnvelope />
@@ -100,9 +98,6 @@ export default function ContactUs() {
         {/* RIGHT FORM */}
         <motion.form
           onSubmit={handleSubmit}
-          initial={{ opacity: 0, x: 40 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6 }}
           className="bg-white rounded-2xl p-8 shadow-lg space-y-6"
         >
           <div>
@@ -149,7 +144,7 @@ export default function ContactUs() {
 
           <button
             type="submit"
-            className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition"
+            className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition cursor-pointer"
           >
             <FaPaperPlane />
             Send Message

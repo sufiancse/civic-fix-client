@@ -91,6 +91,8 @@ const AllIssues = () => {
 
   return (
     <div className="p-6 md:p-10 bg-gray-50 min-h-screen">
+      <title>CivicFix | All Issues</title>
+
       <h1 className="text-3xl font-bold text-primary mb-6">All Issues</h1>
 
       {/* Filters and Search */}

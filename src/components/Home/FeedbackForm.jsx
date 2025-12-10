@@ -107,7 +107,7 @@ const FeedbackSection = () => {
 
             <button
               type="submit"
-              className="bg-primary text-white px-6 py-3 rounded-full hover:bg-primary-dark transition font-medium mt-2"
+              className="bg-primary text-white px-6 py-3 rounded-full hover:bg-primary-dark transition font-medium mt-2 cursor-pointer"
             >
               Submit Feedback
             </button>
