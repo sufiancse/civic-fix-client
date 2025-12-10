@@ -18,6 +18,12 @@ const Navbar = () => {
       <li>
         <MyLink to={"/all-issues"}>All Issues</MyLink>
       </li>
+      <li>
+        <MyLink to={"/about-us"}>About Us</MyLink>
+      </li>
+      <li>
+        <MyLink to={"/contact"}>Contact</MyLink>
+      </li>
     </>
   );
 
