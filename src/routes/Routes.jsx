@@ -19,7 +19,6 @@ import ViewPayments from "../pages/Dashboard/Admin/ViewPayments";
 import AssignedIssues from "../pages/Dashboard/Stuff/AssignedIssues";
 import MyIssues from "../pages/Dashboard/Citizen/MyIssues";
 import ReportIssue from "../pages/Dashboard/Citizen/ReportIssue";
-import MyPayments from "../pages/Dashboard/Citizen/MyPayments";
 import Profile from "../pages/Dashboard/Common/Profile";
 
 export const router = createBrowserRouter([
@@ -110,10 +109,7 @@ export const router = createBrowserRouter([
         path: "user/report-issue",
         element: <ReportIssue />,
       },
-      {
-        path: "user/my-payments",
-        element: <MyPayments />,
-      },
+      
     ],
   },
 ]);

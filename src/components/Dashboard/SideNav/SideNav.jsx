@@ -107,17 +107,7 @@ const SideNav = () => {
           <span className="is-drawer-close:hidden">Report an Issue</span>
         </NavLink>
       </li>
-      <li>
-        <NavLink
-          to="/dashboard/user/my-payments"
-          className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
-          data-tip="Payments"
-        >
-          {/* icon */}
-          <FaMoneyBillWave size={30}></FaMoneyBillWave>
-          <span className="is-drawer-close:hidden">Payments</span>
-        </NavLink>
-      </li>
+      
 
 
       {/* Profile */}
