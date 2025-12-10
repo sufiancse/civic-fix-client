@@ -50,7 +50,7 @@ const SideNav = () => {
       </li>
       <li>
         <NavLink
-          to="/dashboard/admin/manage-stuff"
+          to="/dashboard/admin/manage-staff"
           className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
           data-tip="Manage Staff"
         >
@@ -71,7 +71,7 @@ const SideNav = () => {
         </NavLink>
       </li>
 
-      {/*------------------- Stuff */}
+      {/*------------------- Staff */}
       <li>
         <NavLink
           to="/dashboard/stuff/assigned-issues"
@@ -100,11 +100,11 @@ const SideNav = () => {
         <NavLink
           to="/dashboard/user/report-issue"
           className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
-          data-tip="Report Issue"
+          data-tip="Report an Issue"
         >
          
           <FaPlusCircle size={30}></FaPlusCircle>
-          <span className="is-drawer-close:hidden">Report Issue</span>
+          <span className="is-drawer-close:hidden">Report an Issue</span>
         </NavLink>
       </li>
       <li>

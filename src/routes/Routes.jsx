@@ -14,7 +14,7 @@ import ContactUs from "../pages/ContactUs/ContactUs";
 import DashboardHome from "../pages/Dashboard/Common/DashboardHome";
 import AllIssuesAdminPage from "../pages/Dashboard/Admin/AllIssuesAdminPage";
 import ManageUsers from "../pages/Dashboard/Admin/ManageUsers";
-import ManageStuff from "../pages/Dashboard/Admin/ManageStuff";
+import ManageStaff from "../pages/Dashboard/Admin/ManageStaff";
 import ViewPayments from "../pages/Dashboard/Admin/ViewPayments";
 import AssignedIssues from "../pages/Dashboard/Stuff/AssignedIssues";
 import MyIssues from "../pages/Dashboard/Citizen/MyIssues";
@@ -87,8 +87,8 @@ export const router = createBrowserRouter([
         element: <ManageUsers />,
       },
       {
-        path: "admin/manage-stuff",
-        element: <ManageStuff />,
+        path: "admin/manage-staff",
+        element: <ManageStaff />,
       },
       {
         path: "admin/view-payments",
