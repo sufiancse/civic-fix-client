@@ -14,7 +14,7 @@ import toast from "react-hot-toast";
 // ================= DUMMY USER STATE =================
 const userInfo = {
   isPremium: false, // change to true to allow unlimited issues
-  totalIssues: 1, // already reported
+  totalIssues: 3, // already reported
   maxFreeIssues: 3,
 };
 

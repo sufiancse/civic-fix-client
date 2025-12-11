@@ -1,7 +1,7 @@
 import Container from "../Container";
 import { AiOutlineMenu } from "react-icons/ai";
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, NavLink } from "react-router";
 import useAuth from "../../../hooks/useAuth";
 import avatarImg from "../../../assets/images/placeholder.jpg";
 import Logo from "../Logo";
@@ -64,7 +64,6 @@ const Navbar = () => {
               </div>
               {isOpen && (
                 <div className="absolute rounded-xl shadow-md w-[40vw] md:w-[10vw] bg-white overflow-hidden right-0 top-12 text-sm">
-
                   {user && (
                     <div className="px-4 py-3 border-b-2 border-gray-300 bg-neutral-50 cursor-default">
                       <p className="text-xs text-neutral-500">Signed in as</p>
@@ -75,24 +74,44 @@ const Navbar = () => {
                   )}
 
                   <div className="flex flex-col cursor-pointer">
-                    <Link
+                    
+
+                    <NavLink
                       to="/"
                       className="block md:hidden px-4 py-3 hover:bg-neutral-100 transition font-semibold"
                     >
                       Home
-                    </Link>
+                    </NavLink>
+                    <NavLink
+                      to="/all-issues"
+                      className="block md:hidden px-4 py-3 hover:bg-neutral-100 transition font-semibold"
+                    >
+                      All Issues
+                    </NavLink>
+                    <NavLink
+                      to="/about-us"
+                      className="block md:hidden px-4 py-3 hover:bg-neutral-100 transition font-semibold"
+                    >
+                      About Us
+                    </NavLink>
+                    <NavLink
+                      to="/contact"
+                      className="block md:hidden px-4 py-3 hover:bg-neutral-100 transition font-semibold"
+                    >
+                      Contact
+                    </NavLink>
 
                     {user ? (
                       <>
                         <Link
                           to="/dashboard/home"
-                          className="px-4 py-3 hover:bg-neutral-100 transition font-semibold"
+                          className="px-4 py-3 hover:bg-neutral-100 transition font-bold md:font-semibold"
                         >
                           Dashboard
                         </Link>
                         <div
                           onClick={logOut}
-                          className="px-4 py-3 hover:bg-neutral-100 transition font-semibold cursor-pointer"
+                          className="px-4 py-3 hover:bg-neutral-100 transition font-extrabold md:font-bold cursor-pointer"
                         >
                           Logout
                         </div>
@@ -101,13 +120,13 @@ const Navbar = () => {
                       <>
                         <Link
                           to="/login"
-                          className="px-4 py-3 hover:bg-neutral-100 transition font-semibold"
+                          className="px-4 py-3  hover:bg-neutral-100 transition font-bold md:font-semibold"
                         >
                           Login
                         </Link>
                         <Link
                           to="/signup"
-                          className="px-4 py-3 hover:bg-neutral-100 transition font-semibold"
+                          className="px-4 py-3  hover:bg-neutral-100 transition font-bold md:font-semibold"
                         >
                           Sign Up
                         </Link>
