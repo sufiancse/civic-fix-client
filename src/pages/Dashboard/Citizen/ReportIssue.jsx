@@ -10,17 +10,22 @@ import {
   FaCloudUploadAlt,
 } from "react-icons/fa";
 import toast from "react-hot-toast";
-
-// ================= DUMMY USER STATE =================
-const userInfo = {
-  isPremium: false, // change to true to allow unlimited issues
-  totalIssues: 3, // already reported
-  maxFreeIssues: 3,
-};
+import useAuth from "../../../hooks/useAuth";
+import { imageUpload } from "../../../../utils";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import LoadingSpinner from "../../../components/Shared/LoadingSpinner";
+import ErrorPage from "../../ErrorPage";
 
 export default function ReportIssue() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const axiosSecure = useAxiosSecure();
 
+  //image preview system in form
+  const [preview, setPreview] = useState(null);
+
+  // react-hook-form
   const {
     register,
     handleSubmit,
@@ -28,45 +33,90 @@ export default function ReportIssue() {
     formState: { errors },
   } = useForm();
 
-  //image preview system in form
-  const [preview, setPreview] = useState(null);
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
+  // useQuery for fetching data from db
+  const { data: userData = [], isLoading: userDataLoading } = useQuery({
+    queryKey: ["userData", user?.email],
+    queryFn: async () => {
+      const res = await axiosSecure(`/api/users?email=${user?.email}`);
+      return res.data;
+    },
+  });
 
-    if (file) {
-      setPreview(URL.createObjectURL(file));
+  // useMutation hook for post data in db
+  const {
+    isPending,
+    isError,
+    mutateAsync,
+    reset: mutationReset,
+  } = useMutation({
+    mutationFn: async (payload) =>
+      await axiosSecure.post("/api/report-issue", payload),
+    onSuccess: (data) => {
+      console.log(data);
+      // show toast
+      toast.success("Issue Report Added successfully");
+      // navigate to my inventory page
+      mutationReset();
+      // Query key invalidate
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+    onMutate: (payload) => {
+      console.log("I will post this data--->", payload);
+    },
+    onSettled: (data, error) => {
+      console.log("I am from onSettled--->", data);
+      if (error) console.log(error);
+    },
+    retry: 3,
+  });
+
+  // check free users limit
+  const isPremium = userData[0]?.isPremium;
+  const totalIssues = userData[0]?.totalIssues;
+  const maxFreeIssues = userData[0]?.maxFreeIssues;
+  const isLimitReached = !isPremium && totalIssues >= maxFreeIssues;
+
+  const onSubmit = async (data) => {
+    if (isLimitReached) return;
+
+    const { title, description, category, image, location } = data;
+    const imageFile = image[0];
+
+    try {
+      // upload image for hosting using img bb
+      const imageURL = await imageUpload(imageFile);
+
+      // ===== DUMMY DB SAVE =====
+      const issueData = {
+        title,
+        description,
+        category,
+        image: imageURL,
+        location,
+        issueBy: user?.email,
+        assignedStuff: "",
+        status: "Pending",
+        isBoosted: false,
+        createdAt: new Date(),
+      };
+
+      await mutateAsync(issueData);
+
+      // reset form & redirect
+      reset();
+      setPreview(null);
+
+      navigate("/dashboard/user/my-issues");
+    } catch (err) {
+      console.log(err);
+      toast.error(err?.message);
     }
   };
 
-  const isLimitReached =
-    !userInfo.isPremium && userInfo.totalIssues >= userInfo.maxFreeIssues;
-
-  const onSubmit = (data) => {
-    if (isLimitReached) return;
-
-    // ===== DUMMY DB SAVE =====
-    const issuePayload = {
-      ...data,
-      status: "Pending",
-      createdAt: new Date().toISOString(),
-      timeline: [
-        {
-          action: "Issue Created",
-          date: new Date().toISOString(),
-        },
-      ],
-    };
-
-    console.log("Saved issue:", issuePayload);
-
-    toast.success("Report an issue submit successful.");
-
-    // reset form & redirect
-    reset();
-    setPreview(null);
-
-    navigate("/dashboard/user/my-issues");
-  };
+  if (isPending || userDataLoading) return <LoadingSpinner />;
+  if (isError) return <ErrorPage />;
 
   return (
     <div className="min-h-screen bg-gray-50 px-4 sm:px-6 lg:px-8 py-8">
@@ -129,9 +179,7 @@ export default function ReportIssue() {
               {...register("category", { required: "Category is required" })}
               className="w-full border rounded-lg p-2"
             >
-              <option value="" >
-                Select category
-              </option>
+              <option value="">Select category</option>
               <option>Electricity</option>
               <option>Water</option>
               <option>Road</option>
@@ -172,9 +220,15 @@ export default function ReportIssue() {
 
             <input
               type="file"
+              name="image"
               accept="image/*"
-              {...register("image", { required: "Image is required" })}
-              onChange={handleImageChange}
+              {...register("image", {
+                required: "Image is required",
+                onChange: (e) => {
+                  const file = e.target.files[0];
+                  setPreview(URL.createObjectURL(file));
+                },
+              })}
               id="issue-image"
               className="hidden"
             />
@@ -228,7 +282,7 @@ export default function ReportIssue() {
         <div className="pt-6 text-right">
           <button
             type="submit"
-            className="w-full md:w-auto px-8 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium"
+            className="w-full md:w-auto px-8 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium cursor-pointer"
           >
             Submit Issue
           </button>

@@ -46,7 +46,7 @@ const Login = () => {
         name: user?.displayName,
         email: user?.email,
         image: user?.photoURL,
-        role: "user",
+        role: "citizen",
         isBlock: false,
         isPremium: false,
         maxFreeIssues: 3,
@@ -102,6 +102,7 @@ const Login = () => {
                 type="password"
                 name="password"
                 autoComplete="current-password"
+                defaultValue="111111"
                 id="password"
                 required
                 placeholder="*******"
