@@ -1,94 +1,68 @@
-import { useState } from "react";
 import { FaUser, FaCrown, FaLock, FaUnlock, FaSearch } from "react-icons/fa";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import LoadingSpinner from "../../../components/Shared/LoadingSpinner";
+import toast from "react-hot-toast";
+import Swal from "sweetalert2";
 
 export default function ManageUsers() {
-  const [users, setUsers] = useState([
-    {
-      id: 1,
-      name: "Abu Sufian",
-      email: "sufian@email.com",
-      subscription: "premium",
-      isBlocked: false,
-    },
-    {
-      id: 2,
-      name: "John Doe",
-      email: "john@email.com",
-      subscription: "free",
-      isBlocked: false,
-    },
-    {
-      id: 3,
-      name: "Sara Ahmed",
-      email: "sara@email.com",
-      subscription: "premium",
-      isBlocked: true,
-    },
-    {
-      id: 4,
-      name: "Ali Khan",
-      email: "ali@email.com",
-      subscription: "free",
-      isBlocked: false,
-    },
-  ]);
+  const axiosSecure = useAxiosSecure();
 
-  // Search & Filter state
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterSubscription, setFilterSubscription] = useState("all");
+  const { data: users = [], isLoading } = useQuery({
+    queryKey: ["allUserData"],
+    queryFn: async () => {
+      const res = await axiosSecure(`/api/users?role=citizen`);
+      return res.data;
+    },
+  });
 
-  const toggleBlock = (userId) => {
-    const user = users.find((u) => u.id === userId);
-    const action = user.isBlocked ? "unblock" : "block";
+  const queryClient = useQueryClient();
 
-    if (window.confirm(`Are you sure you want to ${action} this user?`)) {
-      setUsers((prev) =>
-        prev.map((u) =>
-          u.id === userId ? { ...u, isBlocked: !u.isBlocked } : u
-        )
+  // Block/Unblock Mutation
+  const { mutateAsync: toggleBlock } = useMutation({
+    mutationFn: async (user) => {
+      const res = await axiosSecure.patch(`/api/user/${user._id}/block`);
+      return res.data; // { message, isBlocked }
+    },
+    onSuccess: (_, user) => {
+      // Query invalidate to refresh users list
+      queryClient.invalidateQueries(["allUserData"]);
+      toast.success(
+        `${
+          user.isBlocked
+            ? `Unblock ${user.name} successfully`
+            : `Block ${user.name} successfully`
+        }`
       );
-    }
+    },
+    onError: (error) => {
+      console.error("Block/unblock failed:", error);
+    },
+  });
+
+  const handleToggleBlock = async (user) => {
+    Swal.fire({
+      title: `${
+        user.isBlocked ? `Unlock ${user.name}?` : `Block ${user.name}?`
+      }`,
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Confirmed",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        toggleBlock(user);
+      }
+    });
   };
 
-  // Filtered & searched users
-  const filteredUsers = users.filter((user) => {
-    const matchesSearch =
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesSubscription =
-      filterSubscription === "all" || user.subscription === filterSubscription;
-
-    return matchesSearch && matchesSubscription;
-  });
+  if (isLoading) return <LoadingSpinner />;
 
   return (
     <div className="p-4 max-w-full overflow-x-auto">
       <h2 className="text-2xl font-bold mb-4">Manage Users</h2>
-
-      {/* Search & Filter */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-3">
-        <div className="flex items-center gap-2 border rounded-lg px-3 py-2 w-full md:w-1/2">
-          <FaSearch className="text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search by name or email..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full outline-none"
-          />
-        </div>
-
-        <select
-          value={filterSubscription}
-          onChange={(e) => setFilterSubscription(e.target.value)}
-          className="border rounded-lg px-3 py-2 w-full md:w-1/4"
-        >
-          <option value="all">All Users</option>
-          <option value="free">Free Users</option>
-          <option value="premium">Premium Users</option>
-        </select>
-      </div>
 
       {/* Users Table */}
       <table className="min-w-full bg-white rounded-xl shadow-lg overflow-hidden">
@@ -102,19 +76,24 @@ export default function ManageUsers() {
           </tr>
         </thead>
         <tbody>
-          {filteredUsers.map((user) => (
+          {users.map((user) => (
             <tr
-              key={user.id}
+              key={user._id}
               className={`border-b hover:bg-gray-50 ${
                 user.isBlocked ? "bg-red-50" : ""
               }`}
             >
               <td className="p-3 flex items-center gap-2">
-                <FaUser className="text-gray-500" /> {user.name}
+                <img
+                  src={user?.image}
+                  alt="User"
+                  className="w-10 object-cover rounded-full"
+                />
+                {user.name}
               </td>
               <td className="p-3">{user.email}</td>
               <td className="p-3">
-                {user.subscription === "premium" ? (
+                {user.isPremium ? (
                   <span className="flex items-center gap-1 text-yellow-500 font-medium">
                     <FaCrown /> Premium
                   </span>
@@ -129,9 +108,9 @@ export default function ManageUsers() {
                   <span className="text-green-600 font-semibold">Active</span>
                 )}
               </td>
-              <td className="p-3 flex gap-2">
+              <td className="p-3">
                 <button
-                  onClick={() => toggleBlock(user.id)}
+                  onClick={() => handleToggleBlock(user)}
                   className={`flex items-center gap-1 px-3 py-1 rounded-lg text-white text-sm ${
                     user.isBlocked
                       ? "bg-green-600 hover:bg-green-700"
@@ -151,7 +130,7 @@ export default function ManageUsers() {
               </td>
             </tr>
           ))}
-          {filteredUsers.length === 0 && (
+          {users.length === 0 && (
             <tr>
               <td
                 colSpan="5"
