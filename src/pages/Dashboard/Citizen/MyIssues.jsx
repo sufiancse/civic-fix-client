@@ -1,65 +1,41 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router";
-import {
-  FaEdit,
-  FaTrash,
-  FaEye,
-  FaFilter,
-} from "react-icons/fa";
-
-// ================= DUMMY DATA =================
-const initialIssues = [
-  {
-    id: 1,
-    title: "Street light not working",
-    category: "Electricity",
-    status: "Pending",
-    date: "2025-01-10",
-    description: "Street light in front of my house is broken",
-  },
-  {
-    id: 2,
-    title: "Water leakage",
-    category: "Water",
-    status: "Resolved",
-    date: "2025-01-08",
-    description: "Continuous water leakage from pipe",
-  },
-  {
-    id: 3,
-    title: "Road damage near market",
-    category: "Road",
-    status: "Pending",
-    date: "2025-01-05",
-    description: "Big potholes causing traffic",
-  },
-];
+import { FaEdit, FaTrash, FaEye, FaFilter } from "react-icons/fa";
+import useAuth from "../../../hooks/useAuth";
+import { useQuery } from "@tanstack/react-query";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
+import LoadingSpinner from "../../../components/Shared/LoadingSpinner";
 
 // ================= COMPONENT =================
 export default function MyIssues() {
   const navigate = useNavigate();
-  const [issues, setIssues] = useState(initialIssues);
   const [statusFilter, setStatusFilter] = useState("All");
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [editingIssue, setEditingIssue] = useState(null);
 
-  const filteredIssues = issues.filter((issue) => {
-    return (
-      (statusFilter === "All" || issue.status === statusFilter) &&
-      (categoryFilter === "All" || issue.category === categoryFilter)
-    );
+  const { user } = useAuth();
+  const axiosSecure = useAxiosSecure();
+
+  const { data: issuesData = [], isLoading } = useQuery({
+    queryKey: ["userIssues", user?.email, statusFilter, categoryFilter],
+    queryFn: async () => {
+      const res = await axiosSecure(
+        `/api/all-issues?email=${user?.email}&status=${statusFilter}&category=${categoryFilter}`
+      );
+      return res.data;
+    },
   });
 
+  // const [issues, setIssues] = useState(data);
+
+  if (isLoading) return <LoadingSpinner />;
+
   const handleDelete = (id) => {
-    setIssues((prev) => prev.filter((i) => i.id !== id));
+    console.log(id);
   };
 
   const handleUpdate = (e) => {
     e.preventDefault();
-    setIssues((prev) =>
-      prev.map((i) => (i.id === editingIssue.id ? editingIssue : i))
-    );
-    setEditingIssue(null);
   };
 
   return (
@@ -83,7 +59,9 @@ export default function MyIssues() {
           >
             <option>All</option>
             <option>Pending</option>
+            <option>In-Progress</option>
             <option>Resolved</option>
+            <option>Closed</option>
           </select>
         </div>
         <div className="flex items-center gap-2 bg-white p-3 rounded-xl shadow-sm">
@@ -97,21 +75,31 @@ export default function MyIssues() {
             <option>Electricity</option>
             <option>Water</option>
             <option>Road</option>
+            <option>Waste</option>
           </select>
         </div>
       </div>
 
+      {/* when no data available */}
+      <div className="w-full text-center">
+        {!issuesData.length && (
+          <span className="text-3xl font-semibold text-gray-400 ">
+            No Data Available
+          </span>
+        )}
+      </div>
+      
       {/* Issues List */}
       <div className="grid grid-cols-1 gap-4">
-        {filteredIssues.map((issue) => (
+        {issuesData.map((issue) => (
           <div
-            key={issue.id}
+            key={issue._id}
             className="bg-white rounded-2xl shadow-md p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
           >
             <div>
               <h3 className="font-semibold text-gray-800">{issue.title}</h3>
               <p className="text-sm text-gray-500">
-                {issue.category} • {issue.date}
+                {issue.category} • {new Date(issue.createdAt).toLocaleString()}
               </p>
               <span
                 className={`inline-block mt-2 px-3 py-1 rounded-full text-xs font-medium ${
@@ -143,7 +131,7 @@ export default function MyIssues() {
               )}
 
               <button
-                onClick={() => handleDelete(issue.id)}
+                onClick={() => handleDelete(issue._id)}
                 className="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100"
               >
                 <FaTrash />

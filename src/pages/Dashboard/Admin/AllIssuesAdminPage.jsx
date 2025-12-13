@@ -1,71 +1,100 @@
 import { useState } from "react";
 import { FaUserPlus, FaTrash, FaExclamationTriangle } from "react-icons/fa";
 import { Dialog } from "@headlessui/react"; // modal library for simplicity
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
+import LoadingSpinner from "../../../components/Shared/LoadingSpinner";
+import toast from "react-hot-toast";
+import Swal from "sweetalert2";
 
 export default function AllIssues() {
-  // ✅ Dummy issues data
-  const [issues, setIssues] = useState([
-    {
-      id: 1,
-      title: "Street light not working",
-      category: "Electricity",
-      status: "pending",
-      priority: "high",
-      boosted: true,
-      assignedStaff: null,
-    },
-    {
-      id: 2,
-      title: "Water leakage in main pipe",
-      category: "Water",
-      status: "pending",
-      priority: "normal",
-      boosted: false,
-      assignedStaff: "John Doe",
-    },
-    {
-      id: 3,
-      title: "Road pothole near school",
-      category: "Road",
-      status: "pending",
-      priority: "high",
-      boosted: true,
-      assignedStaff: null,
-    },
-  ]);
-
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentIssueId, setCurrentIssueId] = useState(null);
+  const [currentIssue, setCurrentIssue] = useState(null);
   const [selectedStaff, setSelectedStaff] = useState("");
+  const axiosSecure = useAxiosSecure();
 
-  // Dummy staff list
-  const staffList = ["John Doe", "Jane Smith", "Ali Khan", "Sara Ahmed"];
+  const queryClient = useQueryClient();
 
-  const openAssignModal = (issueId) => {
-    setCurrentIssueId(issueId);
+  const { data: allIssues = [], isLoading } = useQuery({
+    queryKey: ["allIssuesAdminPage"],
+    queryFn: async () => {
+      const res = await axiosSecure("/api/all-issues");
+      return res.data;
+    },
+  });
+
+  const { data: staffList = [] } = useQuery({
+    queryKey: ["staff"],
+    queryFn: async () => {
+      const res = await axiosSecure(`/api/users?role=staff`);
+      return res.data;
+    },
+  });
+
+  const assignMutation = useMutation({
+    mutationFn: async () => {
+      const staff = staffList.find((s) => s._id === selectedStaff);
+
+      return axiosSecure.patch(`/api/issues/${currentIssue._id}/assign`, {
+        staffEmail: staff.email,
+        staffName: staff.name,
+      });
+    },
+    onSuccess: () => {
+      toast.success("Staff assigned successfully");
+
+      queryClient.invalidateQueries(["allIssuesAdminPage"]);
+
+      setIsModalOpen(false);
+      setSelectedStaff("");
+    },
+  });
+
+  const rejectMutation = useMutation({
+    mutationFn: async (issueId) => {
+      return axiosSecure.patch(`/api/issues/${issueId}/reject`);
+    },
+    onSuccess: () => {
+      toast.success("Issue reject successfully.");
+      queryClient.invalidateQueries(["allIssuesAdminPage"]);
+    },
+  });
+
+  const openAssignModal = (issue) => {
+    setCurrentIssue(issue);
     setSelectedStaff("");
     setIsModalOpen(true);
   };
 
   const assignStaff = () => {
-    setIssues((prev) =>
-      prev.map((issue) =>
-        issue.id === currentIssueId
-          ? { ...issue, assignedStaff: selectedStaff }
-          : issue
-      )
-    );
+    if (!selectedStaff) {
+      toast.error("Please select a staff");
+      return;
+    }
+    assignMutation.mutate();
     setIsModalOpen(false);
   };
 
-  const rejectIssue = (issueId) => {
-    if (window.confirm("Are you sure you want to reject this issue?")) {
-      setIssues((prev) => prev.filter((issue) => issue.id !== issueId));
-    }
+  const rejectIssue = (issue) => {
+    Swal.fire({
+      title: "Reject this issue?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Confirmed",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        rejectMutation.mutate(issue._id);
+      }
+    });
   };
 
   // Sort boosted issues on top
-  const sortedIssues = [...issues].sort((a, b) => b.boosted - a.boosted);
+  const sortedIssues = [...allIssues].sort((a, b) => b.boosted - a.boosted);
+
+  if (isLoading) return <LoadingSpinner />;
 
   return (
     <div className="p-4 max-w-full overflow-x-auto">
@@ -84,19 +113,19 @@ export default function AllIssues() {
         <tbody>
           {sortedIssues.map((issue) => (
             <tr
-              key={issue.id}
+              key={issue._id}
               className={`border-b hover:bg-gray-50 ${
-                issue.boosted ? "bg-yellow-50 font-semibold" : ""
+                issue.isBoosted ? "bg-yellow-50 font-semibold" : ""
               }`}
             >
               <td className="p-3">{issue.title}</td>
               <td className="p-3">{issue.category}</td>
-              <td className="p-3 capitalize">{issue.status}</td>
+              <td className="p-3 ">{issue.status}</td>
               <td className="p-3 capitalize">
-                {issue.priority === "high" ? (
-                  <span className="text-red-600 font-medium">{issue.priority}</span>
+                {issue.isBoosted ? (
+                  <span className="text-red-600 font-medium">High</span>
                 ) : (
-                  <span className="text-gray-600">{issue.priority}</span>
+                  <span className="text-gray-600">Normal</span>
                 )}
               </td>
               <td className="p-3">
@@ -108,7 +137,7 @@ export default function AllIssues() {
                 {/* Assign Staff */}
                 {!issue.assignedStaff && (
                   <button
-                    onClick={() => openAssignModal(issue.id)}
+                    onClick={() => openAssignModal(issue)}
                     className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg text-sm"
                   >
                     <FaUserPlus /> Assign Staff
@@ -116,9 +145,9 @@ export default function AllIssues() {
                 )}
 
                 {/* Reject Issue */}
-                {issue.status === "pending" && (
+                {issue.status === "Pending" && (
                   <button
-                    onClick={() => rejectIssue(issue.id)}
+                    onClick={() => rejectIssue(issue)}
                     className="flex items-center gap-1 bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg text-sm"
                   >
                     <FaTrash /> Reject
@@ -148,8 +177,8 @@ export default function AllIssues() {
             >
               <option value="">Select Staff</option>
               {staffList.map((staff, i) => (
-                <option key={i} value={staff}>
-                  {staff}
+                <option key={i} value={staff._id}>
+                  {staff.name}
                 </option>
               ))}
             </select>
@@ -164,7 +193,9 @@ export default function AllIssues() {
                 onClick={assignStaff}
                 disabled={!selectedStaff}
                 className={`px-4 py-2 rounded-lg text-white ${
-                  selectedStaff ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-300 cursor-not-allowed"
+                  selectedStaff
+                    ? "bg-blue-600 hover:bg-blue-700"
+                    : "bg-gray-300 cursor-not-allowed"
                 }`}
               >
                 Assign

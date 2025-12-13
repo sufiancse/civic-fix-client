@@ -96,7 +96,7 @@ export default function ReportIssue() {
         image: imageURL,
         location,
         issueBy: user?.email,
-        assignedStuff: "",
+        assignedStaff: "",
         status: "Pending",
         isBoosted: false,
         createdAt: new Date(),

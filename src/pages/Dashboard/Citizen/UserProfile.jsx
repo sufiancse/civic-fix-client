@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   FaUserCircle,
   FaEnvelope,
@@ -8,22 +8,37 @@ import {
   FaExclamationTriangle,
   FaCheckCircle,
 } from "react-icons/fa";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
+import useAuth from "../../../hooks/useAuth";
+import LoadingSpinner from "../../../components/Shared/LoadingSpinner";
 
 export default function UserProfile() {
+  const axiosSecure = useAxiosSecure();
+  const { user: userDetail } = useAuth();
+
+  // useQuery for fetching data from db
+  const { data: user = [], isLoading: userDataLoading } = useQuery({
+    queryKey: ["userData", userDetail?.email],
+    queryFn: async () => {
+      const res = await axiosSecure(`/api/users?email=${userDetail?.email}`);
+      return res.data;
+    },
+  });
 
   // ✅ Dummy user data
-  const [user, setUser] = useState({
-    name: "Abu Sufian",
-    email: "sufian@email.com",
-    phone: "+880 17xxxxxxx",
-    status: "free", // free | premium
-    isBlocked: true,
-  });
+  // const [user, setUser] = useState({
+  //   name: "Abu Sufian",
+  //   email: "sufian@email.com",
+  //   phone: "+880 17xxxxxxx",
+  //   status: "free", // free | premium
+  //   isBlocked: true,
+  // });
 
   const handleSubscribe = () => {
     alert("✅ Payment Successful (Dummy)");
-    setUser({ ...user, role: "premium" });
   };
+
+  if (userDataLoading) return <LoadingSpinner />;
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
@@ -45,17 +60,17 @@ export default function UserProfile() {
         {/* Header */}
         <div className="bg-linear-to-r from-blue-600 to-indigo-600 text-white p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4">
-            <FaUserCircle className="text-6xl" />
+            <img src={user?.image} alt={user?.name} className="w-15 rounded-full"/>
             <div>
               <h2 className="text-2xl font-bold flex items-center gap-2">
-                {user.name}
-                {user.role === "premium" && (
+                {user?.name}
+                {user?.isPremium && (
                   <span className="flex items-center gap-1 text-xs bg-yellow-400 text-black px-2 py-1 rounded-full">
                     <FaCrown /> Premium
                   </span>
                 )}
               </h2>
-              <p className="text-sm opacity-90">{user.email}</p>
+              <p className="text-sm opacity-90">{user?.email}</p>
             </div>
           </div>
 
@@ -73,20 +88,19 @@ export default function UserProfile() {
             </h3>
 
             <div className="flex items-center gap-3 text-sm">
-              <FaEnvelope className="text-gray-500" />
-              <span>{user.email}</span>
+              <FaUserCircle className="text-gray-500" />
+              <span>{user.name}</span>
             </div>
 
             <div className="flex items-center gap-3 text-sm">
-              <FaPhoneAlt className="text-gray-500" />
-              <span>{user.phone}</span>
+              <FaEnvelope className="text-gray-500" />
+              <span>{user?.email}</span>
             </div>
 
             <div className="flex items-center gap-3 text-sm">
               <FaCheckCircle className="text-green-500" />
               <span>
-                Account Status:{" "}
-                {user.role === "premium" ? "Premium User" : "Free User"}
+                Account Status: {user.isPremium ? "Premium User" : "Free User"}
               </span>
             </div>
           </div>
@@ -97,11 +111,11 @@ export default function UserProfile() {
               Subscription Status
             </h3>
 
-            {user.status === "free" ? (
+            {!user.isPremium ? (
               <>
                 <p className="text-sm text-gray-600 mb-4">
-                  Free users can submit only 3 issues.  
-                  Upgrade to premium for unlimited access.
+                  Free users can submit only 3 issues. Upgrade to premium for
+                  unlimited access.
                 </p>
                 <button
                   onClick={handleSubscribe}
