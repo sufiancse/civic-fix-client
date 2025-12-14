@@ -14,7 +14,7 @@ export default function AdminProfile() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({});
 
-  /* ================= FETCH ADMIN ================= */
+  // data fetching using useQuery
   const { data = [], isLoading } = useQuery({
     enabled: !!user?.email,
     queryKey: ["adminProfile", user?.email],
@@ -28,7 +28,7 @@ export default function AdminProfile() {
 
   const admin = data?.[0];
 
-  /* ================= OPEN MODAL ================= */
+
   const openModal = () => {
     setFormData({
       name: admin?.name || "",
@@ -38,11 +38,11 @@ export default function AdminProfile() {
     setIsModalOpen(true);
   };
 
-  /* ================= UPDATE ================= */
+  // data update use mutation
   const updateMutation = useMutation({
     mutationFn: async (updatedAdminData) => {
       return axiosSecure.patch(
-        `/api/admin/${admin._id}/update`,
+        `/api/user/${admin._id}/update`,
         updatedAdminData
       );
     },

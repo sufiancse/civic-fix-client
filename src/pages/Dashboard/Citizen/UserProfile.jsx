@@ -1,8 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   FaUserCircle,
   FaEnvelope,
-  FaPhoneAlt,
   FaCrown,
   FaEdit,
   FaExclamationTriangle,
@@ -10,39 +9,93 @@ import {
 } from "react-icons/fa";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import useAuth from "../../../hooks/useAuth";
-import LoadingSpinner from "../../../components/Shared/LoadingSpinner";
+import { useState } from "react";
+import toast from "react-hot-toast";
+import { imageUpload } from "../../../../utils";
 
 export default function UserProfile() {
   const axiosSecure = useAxiosSecure();
   const { user: userDetail } = useAuth();
+  const [formData, setFormData] = useState({});
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const queryClient = useQueryClient();
 
   // useQuery for fetching data from db
-  const { data: user = [], isLoading: userDataLoading } = useQuery({
-    queryKey: ["userData", userDetail?.email],
+  const { data = [], isLoading: userDataLoading } = useQuery({
+    queryKey: ["userProfile", userDetail?.email],
     queryFn: async () => {
       const res = await axiosSecure(`/api/users?email=${userDetail?.email}`);
       return res.data;
     },
   });
 
-  // ✅ Dummy user data
-  // const [user, setUser] = useState({
-  //   name: "Abu Sufian",
-  //   email: "sufian@email.com",
-  //   phone: "+880 17xxxxxxx",
-  //   status: "free", // free | premium
-  //   isBlocked: true,
-  // });
+  const user = data?.[0];
+
+  const openModal = () => {
+    setFormData({
+      name: user?.name || "",
+      email: user?.email || "",
+      role: user?.role || "",
+    });
+    setIsModalOpen(true);
+  };
+
+  // data update using useMutation
+  const updateMutation = useMutation({
+    mutationFn: async (updatedUserData) => {
+      return axiosSecure.patch(
+        `/api/user/${user._id}/update`,
+        updatedUserData
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["userProfile"]);
+      setIsModalOpen(false);
+      toast.success("Profile update successfully.");
+    },
+  });
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const name = e.target.name.value;
+    const imageFile = e.target.image.files[0];
+
+    try {
+      // upload image for hosting using img bb
+      const imageURL = await imageUpload(imageFile);
+
+      // ===== DUMMY DB SAVE =====
+      const updatedUserData = {
+        name,
+        image: imageURL,
+      };
+
+      updateMutation.mutate(updatedUserData);
+    } catch (err) {
+      console.log(err);
+      toast.error(err?.message);
+    }
+  };
 
   const handleSubscribe = () => {
     alert("✅ Payment Successful (Dummy)");
   };
 
-  if (userDataLoading) return <LoadingSpinner />;
+  if (userDataLoading) {
+    return <p className="text-center py-10">Loading profile...</p>;
+  }
+
+  if (!user) {
+    return <p className="text-center py-10">No user data found</p>;
+  }
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
-      {/* 🔴 Blocked Warning */}
+      {/* Blocked Warning */}
       {user.isBlocked && (
         <div className="mb-6 bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl flex items-start gap-3">
           <FaExclamationTriangle className="text-xl mt-0.5" />
@@ -60,7 +113,11 @@ export default function UserProfile() {
         {/* Header */}
         <div className="bg-linear-to-r from-blue-600 to-indigo-600 text-white p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4">
-            <img src={user?.image} alt={user?.name} className="w-15 rounded-full"/>
+            <img
+              src={user?.image}
+              alt={user?.name}
+              className="w-15 max-h-15 rounded-full"
+            />
             <div>
               <h2 className="text-2xl font-bold flex items-center gap-2">
                 {user?.name}
@@ -74,7 +131,10 @@ export default function UserProfile() {
             </div>
           </div>
 
-          <button className="flex items-center gap-2 bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg text-sm">
+          <button
+            onClick={openModal}
+            className="cursor-pointer flex items-center gap-2 bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg text-sm"
+          >
             <FaEdit /> Edit Profile
           </button>
         </div>
@@ -133,6 +193,54 @@ export default function UserProfile() {
           </div>
         </div>
       </div>
+
+       {isModalOpen && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white w-full max-w-md rounded-xl p-6">
+            <h3 className="text-lg font-bold mb-4">Edit Profile</h3>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="text-sm font-medium">Name</label>
+                <input
+                  name="name"
+                  defaultValue={formData.name}
+                  onChange={handleChange}
+                  className="w-full border rounded-lg p-2"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-medium">Image </label>
+                <input
+                  name="image"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleChange}
+                  className="w-full border rounded-lg p-2"
+                />
+              </div>
+
+              <div className="flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="px-4 py-2 border rounded-lg cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg cursor-pointer"
+                >
+                  Save
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
