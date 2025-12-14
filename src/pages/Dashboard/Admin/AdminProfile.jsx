@@ -73,6 +73,7 @@ export default function AdminProfile() {
       };
 
       updateMutation.mutate(updatedAdminData);
+      
     } catch (err) {
       console.log(err);
       toast.error(err?.message);

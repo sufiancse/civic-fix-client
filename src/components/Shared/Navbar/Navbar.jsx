@@ -6,9 +6,23 @@ import useAuth from "../../../hooks/useAuth";
 import avatarImg from "../../../assets/images/placeholder.jpg";
 import Logo from "../Logo";
 import MyLink from "./MyLink";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
+import { useQuery } from "@tanstack/react-query";
+
 const Navbar = () => {
   const { user, logOut } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
+  const axiosSecure = useAxiosSecure();
+
+  const {data} = useQuery({
+    queryKey: ["NavUser", user?.email],
+    queryFn: async () => {
+      const res = await axiosSecure(`/api/users?email=${user?.email}`)
+      return res.data
+    }
+  });
+
+  const userData = data?.[0]
 
   const links = (
     <>
@@ -54,7 +68,7 @@ const Navbar = () => {
                     <img
                       className="rounded-full"
                       referrerPolicy="no-referrer"
-                      src={user && user.photoURL ? user.photoURL : avatarImg}
+                      src={user && userData ? userData.image : avatarImg}
                       alt="profile"
                       height="30"
                       width="30"
@@ -68,14 +82,12 @@ const Navbar = () => {
                     <div className="px-4 py-3 border-b-2 border-gray-300 bg-neutral-50 cursor-default">
                       <p className="text-xs text-neutral-500">Signed in as</p>
                       <p className="font-semibold text-secondary">
-                        {user?.displayName}
+                        {userData?.name}
                       </p>
                     </div>
                   )}
 
                   <div className="flex flex-col cursor-pointer">
-                    
-
                     <NavLink
                       to="/"
                       className="block md:hidden px-4 py-3 hover:bg-neutral-100 transition font-semibold"
