@@ -42,6 +42,7 @@ const SignUp = () => {
         maxFreeIssues: 3,
         totalIssues: 0,
       };
+      
       await saveOrUpdateUser(userData);
 
       // Save username & profile photo
