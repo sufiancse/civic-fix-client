@@ -2,11 +2,14 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router";
 import { FaEdit, FaTrash, FaEye, FaFilter } from "react-icons/fa";
 import useAuth from "../../../hooks/useAuth";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import LoadingSpinner from "../../../components/Shared/LoadingSpinner";
+import toast from "react-hot-toast";
+import Swal from "sweetalert2";
+import { imageUpload } from "../../../../utils";
 
-// ================= COMPONENT =================
+
 export default function MyIssues() {
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState("All");
@@ -16,7 +19,11 @@ export default function MyIssues() {
   const { user } = useAuth();
   const axiosSecure = useAxiosSecure();
 
-  const { data: issuesData = [], isLoading } = useQuery({
+  const {
+    data: issuesData = [],
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ["userIssues", user?.email, statusFilter, categoryFilter],
     queryFn: async () => {
       const res = await axiosSecure(
@@ -26,17 +33,76 @@ export default function MyIssues() {
     },
   });
 
-  // const [issues, setIssues] = useState(data);
+  const deleteMutation = useMutation({
+    mutationFn: async (id) => {
+      return axiosSecure.delete(`/api/issue/${id}/delete`);
+    },
+    onSuccess: () => {
+      toast.success("Issue delete successfully");
 
-  if (isLoading) return <LoadingSpinner />;
+      refetch();
+    },
+  });
 
   const handleDelete = (id) => {
-    console.log(id);
+    Swal.fire({
+      title: "Are you sure you want to delete this issue?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Confirmed",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        deleteMutation.mutate(id);
+      }
+    });
   };
 
-  const handleUpdate = (e) => {
+  const updateMutation = useMutation({
+    mutationFn: async (updatedData) => {
+      return axiosSecure.patch(
+        `/api/issue/${editingIssue._id}/update`,
+        updatedData
+      );
+    },
+    onSuccess: () => {
+      toast.success("Issue update successfully.");
+
+      setEditingIssue(null);
+
+      refetch();
+    },
+  });
+
+  const handleUpdate = async (e) => {
     e.preventDefault();
+
+    const imageFile = e.target.image.files[0];
+
+    try {
+      let imageURL = editingIssue.image;
+
+      if (imageFile) {
+        imageURL = await imageUpload(imageFile);
+      }
+
+      const updatedData = {
+        title: editingIssue.title,
+        description: editingIssue.description,
+        category: editingIssue.category,
+        location: editingIssue.location,
+        image: imageURL,
+      };
+
+      updateMutation.mutate(updatedData);
+    } catch (error) {
+      console.log("Issue updated error:", error);
+    }
   };
+
+  if (isLoading) return <LoadingSpinner />;
 
   return (
     <div className="min-h-screen bg-gray-50 px-4 sm:px-6 lg:px-8 py-6">
@@ -88,7 +154,7 @@ export default function MyIssues() {
           </span>
         )}
       </div>
-      
+
       {/* Issues List */}
       <div className="grid grid-cols-1 gap-4">
         {issuesData.map((issue) => (
@@ -116,7 +182,7 @@ export default function MyIssues() {
             <div className="flex gap-2">
               <button
                 onClick={() => navigate(`/issues/${issue.id}`)}
-                className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100"
+                className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 cursor-pointer"
               >
                 <FaEye />
               </button>
@@ -124,7 +190,7 @@ export default function MyIssues() {
               {issue.status === "Pending" && (
                 <button
                   onClick={() => setEditingIssue(issue)}
-                  className="p-2 rounded-lg bg-green-50 text-green-600 hover:bg-green-100"
+                  className="p-2 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 cursor-pointer"
                 >
                   <FaEdit />
                 </button>
@@ -132,7 +198,7 @@ export default function MyIssues() {
 
               <button
                 onClick={() => handleDelete(issue._id)}
-                className="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100"
+                className="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 cursor-pointer"
               >
                 <FaTrash />
               </button>
@@ -146,37 +212,101 @@ export default function MyIssues() {
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl w-full max-w-lg p-6">
             <h3 className="text-lg font-semibold mb-4">Edit Issue</h3>
+
             <form onSubmit={handleUpdate} className="space-y-4">
-              <input
-                type="text"
-                value={editingIssue.title}
-                onChange={(e) =>
-                  setEditingIssue({ ...editingIssue, title: e.target.value })
-                }
-                className="w-full border rounded-lg p-2"
-              />
-              <textarea
-                rows="3"
-                value={editingIssue.description}
-                onChange={(e) =>
-                  setEditingIssue({
-                    ...editingIssue,
-                    description: e.target.value,
-                  })
-                }
-                className="w-full border rounded-lg p-2"
-              />
-              <div className="flex justify-end gap-3">
+              {/* Title */}
+              <div>
+                <label className="text-sm font-medium">Title</label>
+                <input
+                  type="text"
+                  value={editingIssue.title}
+                  onChange={(e) =>
+                    setEditingIssue({ ...editingIssue, title: e.target.value })
+                  }
+                  className="w-full border rounded-lg p-2"
+                  required
+                />
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="text-sm font-medium">Description</label>
+                <textarea
+                  rows="3"
+                  value={editingIssue.description}
+                  onChange={(e) =>
+                    setEditingIssue({
+                      ...editingIssue,
+                      description: e.target.value,
+                    })
+                  }
+                  className="w-full border rounded-lg p-2"
+                  required
+                />
+              </div>
+
+              {/* Category */}
+              <div>
+                <label className="text-sm font-medium">Category</label>
+                <select
+                  value={editingIssue.category}
+                  onChange={(e) =>
+                    setEditingIssue({
+                      ...editingIssue,
+                      category: e.target.value,
+                    })
+                  }
+                  className="w-full border rounded-lg p-2"
+                >
+                  <option value="Electricity">Electricity</option>
+                  <option value="Water">Water</option>
+                  <option value="Road">Road</option>
+                  <option value="Waste">Waste</option>
+                </select>
+              </div>
+
+              {/* Location */}
+              <div>
+                <label className="text-sm font-medium">Location</label>
+                <input
+                  type="text"
+                  value={editingIssue.location || ""}
+                  onChange={(e) =>
+                    setEditingIssue({
+                      ...editingIssue,
+                      location: e.target.value,
+                    })
+                  }
+                  className="w-full border rounded-lg p-2"
+                />
+              </div>
+
+              {/* Image */}
+              <div>
+                <label className="text-sm font-medium">Change Image</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  name="image"
+                  className="w-full border rounded-lg p-2"
+                />
+              </div>
+
+              {/* Actions */}
+              <div className="flex justify-end gap-3 pt-2">
                 <button
                   type="button"
-                  onClick={() => setEditingIssue(null)}
-                  className="px-4 py-2 rounded-lg border"
+                  onClick={() => {
+                    setEditingIssue(null);
+                  }}
+                  className="px-4 py-2 rounded-lg border cursor-pointer"
                 >
                   Cancel
                 </button>
+
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-lg bg-blue-600 text-white"
+                  className="px-4 py-2 rounded-lg bg-blue-600 text-white cursor-pointer"
                 >
                   Update
                 </button>

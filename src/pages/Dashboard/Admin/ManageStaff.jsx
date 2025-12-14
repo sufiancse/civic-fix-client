@@ -52,7 +52,10 @@ export default function ManageStaff() {
 
   const updateMutation = useMutation({
     mutationFn: async (updatedStaffData) => {
-      return axiosSecure.patch(`/api/staff/${currentStaff._id}/update`, updatedStaffData);
+      return axiosSecure.patch(
+        `/api/staff/${currentStaff._id}/update`,
+        updatedStaffData
+      );
     },
     onSuccess: () => {
       toast.success("Staff update successfully.");
@@ -70,7 +73,6 @@ export default function ManageStaff() {
       toast.success("Staff delete successfully");
 
       refetch();
-
     },
   });
 
@@ -142,20 +144,18 @@ export default function ManageStaff() {
   // Delete staff
   const handleDelete = (id) => {
     Swal.fire({
-  title: "Are you sure you want to delete this staff?",
-  text: "You won't be able to revert this!",
-  icon: "warning",
-  showCancelButton: true,
-  confirmButtonColor: "#3085d6",
-  cancelButtonColor: "#d33",
-  confirmButtonText: "Confirmed"
-}).then((result) => {
-  if (result.isConfirmed) {
-   deleteMutation.mutate(id)
-  }
-});
-  
-    
+      title: "Are you sure you want to delete this staff?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Confirmed",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        deleteMutation.mutate(id);
+      }
+    });
   };
 
   if (isLoading) return <LoadingSpinner />;
