@@ -88,7 +88,7 @@ export default function ReportIssue() {
       // upload image for hosting using img bb
       const imageURL = await imageUpload(imageFile);
 
-      // ===== DUMMY DB SAVE =====
+      
       const issueData = {
         title,
         description,
@@ -100,6 +100,7 @@ export default function ReportIssue() {
         status: "Pending",
         isBoosted: false,
         createdAt: new Date(),
+        upVotes: 0,
       };
 
       await mutateAsync(issueData);

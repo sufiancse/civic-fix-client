@@ -29,7 +29,7 @@ export default function AssignedPage() {
     mutationFn: ({ id, newStatus }) =>
       axiosSecure.patch(`/api/issues/${id}/status`, {
         newStatus,
-        changedBy: user.email,
+        changedBy: "staff",
       }),
     onSuccess: () => {
       queryClient.invalidateQueries(["AssignedIssues", user.email]);
