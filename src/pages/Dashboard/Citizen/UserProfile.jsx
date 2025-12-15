@@ -12,6 +12,7 @@ import useAuth from "../../../hooks/useAuth";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { imageUpload } from "../../../../utils";
+import axios from "axios";
 
 export default function UserProfile() {
   const axiosSecure = useAxiosSecure();
@@ -43,10 +44,7 @@ export default function UserProfile() {
   // data update using useMutation
   const updateMutation = useMutation({
     mutationFn: async (updatedUserData) => {
-      return axiosSecure.patch(
-        `/api/user/${user._id}/update`,
-        updatedUserData
-      );
+      return axiosSecure.patch(`/api/user/${user._id}/update`, updatedUserData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["userProfile"]);
@@ -81,8 +79,19 @@ export default function UserProfile() {
     }
   };
 
-  const handleSubscribe = () => {
-    alert("✅ Payment Successful (Dummy)");
+  const handleSubscribe = async () => {
+    const paymentInfo = {
+      userId: user?._id,
+      email: user?.email,
+      name: user?.name,
+      price: 1000,
+    };
+
+    const { data } = await axios.post(
+      `${import.meta.env.VITE_API_URL}/create-checkout-session`,
+      paymentInfo
+    );
+    window.location.href = data?.url;
   };
 
   if (userDataLoading) {
@@ -179,7 +188,7 @@ export default function UserProfile() {
                 </p>
                 <button
                   onClick={handleSubscribe}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium cursor-pointer"
                 >
                   Subscribe for ৳1000
                 </button>
@@ -194,7 +203,7 @@ export default function UserProfile() {
         </div>
       </div>
 
-       {isModalOpen && (
+      {isModalOpen && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white w-full max-w-md rounded-xl p-6">
             <h3 className="text-lg font-bold mb-4">Edit Profile</h3>

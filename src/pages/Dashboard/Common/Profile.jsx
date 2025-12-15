@@ -5,9 +5,9 @@ import StaffProfile from "../Stuff/StaffProfile";
 const Profile = () => {
   return (
     <div>
-      <AdminProfile />
+      {/* <AdminProfile /> */}
       <UserProfile />
-      <StaffProfile />
+      {/* <StaffProfile /> */}
     </div>
   );
 };

@@ -20,6 +20,7 @@ import AssignedIssues from "../pages/Dashboard/Stuff/AssignedIssues";
 import MyIssues from "../pages/Dashboard/Citizen/MyIssues";
 import ReportIssue from "../pages/Dashboard/Citizen/ReportIssue";
 import Profile from "../pages/Dashboard/Common/Profile";
+import PaymentSuccess from "../pages/Payments/PaymentSuccess";
 
 export const router = createBrowserRouter([
   {
@@ -51,6 +52,10 @@ export const router = createBrowserRouter([
         path: "/contact",
         element: <ContactUs />,
       },
+      {
+        path: "/payment-success",
+        element: <PaymentSuccess />,
+      },
     ],
   },
   { path: "/login", element: <Login /> },
@@ -73,7 +78,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "profile",
-        element : <Profile />
+        element: <Profile />,
       },
 
       // admin only routes
@@ -109,7 +114,6 @@ export const router = createBrowserRouter([
         path: "user/report-issue",
         element: <ReportIssue />,
       },
-      
     ],
   },
 ]);
