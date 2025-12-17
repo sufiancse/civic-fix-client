@@ -8,35 +8,49 @@ import Logo from "../Logo";
 import MyLink from "./MyLink";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import { useQuery } from "@tanstack/react-query";
+import { FaEnvelope, FaHome, FaInfo, FaInfoCircle } from "react-icons/fa";
+import { MdOutlineReportProblem } from "react-icons/md";
 
 const Navbar = () => {
   const { user, logOut } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const axiosSecure = useAxiosSecure();
 
-  const {data} = useQuery({
+  const { data } = useQuery({
     queryKey: ["NavUser", user?.email],
     queryFn: async () => {
-      const res = await axiosSecure(`/api/users?email=${user?.email}`)
-      return res.data
-    }
+      const res = await axiosSecure(`/api/users?email=${user?.email}`);
+      return res.data;
+    },
   });
 
-  const userData = data?.[0]
+  const userData = data?.[0];
 
   const links = (
     <>
       <li>
-        <MyLink to={"/"}>Home</MyLink>
+        <MyLink to={"/"}>
+          {" "}
+          <FaHome /> Home
+        </MyLink>
       </li>
       <li>
-        <MyLink to={"/all-issues"}>All Issues</MyLink>
+        <MyLink to={"/all-issues"}>
+          {" "}
+          <MdOutlineReportProblem /> All Issues
+        </MyLink>
       </li>
       <li>
-        <MyLink to={"/about-us"}>About Us</MyLink>
+        <MyLink to={"/about-us"}>
+          {" "}
+          <FaInfoCircle /> About Us
+        </MyLink>
       </li>
       <li>
-        <MyLink to={"/contact"}>Contact</MyLink>
+        <MyLink to={"/contact"}>
+          {" "}
+          <FaEnvelope /> Contact
+        </MyLink>
       </li>
     </>
   );
@@ -50,7 +64,7 @@ const Navbar = () => {
             <Logo />
 
             {/* Nav Links */}
-            <ul className="hidden md:flex justify-center items-center gap-2">
+            <ul className="hidden md:flex justify-center items-center gap-5">
               {links}
             </ul>
 

@@ -9,7 +9,6 @@ import toast from "react-hot-toast";
 import Swal from "sweetalert2";
 import { imageUpload } from "../../../../utils";
 
-
 export default function MyIssues() {
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState("All");
@@ -34,8 +33,10 @@ export default function MyIssues() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: async (id) => {
-      return axiosSecure.delete(`/api/issue/${id}/delete`);
+    mutationFn: async ({ id, email }) => {
+      return axiosSecure.delete(`/api/issue/${id}/delete`, {
+        data: { email },
+      });
     },
     onSuccess: () => {
       toast.success("Issue delete successfully");
@@ -55,7 +56,7 @@ export default function MyIssues() {
       confirmButtonText: "Confirmed",
     }).then((result) => {
       if (result.isConfirmed) {
-        deleteMutation.mutate(id);
+        deleteMutation.mutate({ id, email: user?.email });
       }
     });
   };
@@ -181,7 +182,7 @@ export default function MyIssues() {
             {/* Actions */}
             <div className="flex gap-2">
               <button
-                onClick={() => navigate(`/issues/${issue.id}`)}
+                onClick={() => navigate(`/issue-details/${issue._id}`)}
                 className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 cursor-pointer"
               >
                 <FaEye />
@@ -207,7 +208,7 @@ export default function MyIssues() {
         ))}
       </div>
 
-      {/* Edit Modal */}
+      {/* Edit Issue */}
       {editingIssue && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl w-full max-w-lg p-6">

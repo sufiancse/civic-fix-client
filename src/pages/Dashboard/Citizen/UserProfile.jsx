@@ -25,7 +25,7 @@ export default function UserProfile() {
   const { data = [], isLoading: userDataLoading } = useQuery({
     queryKey: ["userProfile", userDetail?.email],
     queryFn: async () => {
-      const res = await axiosSecure(`/api/users?email=${userDetail?.email}`);
+      const res = await axiosSecure(`/api/users?email=${userDetail?.email}&role=citizen`);
       return res.data;
     },
   });

@@ -20,7 +20,7 @@ export default function AdminProfile() {
     queryKey: ["adminProfile", user?.email],
     queryFn: async () => {
       const res = await axiosSecure(
-        `/api/users?email=${user.email}&role=admin`
+        `/api/users?email=${user?.email}&role=admin`
       );
       return res.data;
     },
@@ -101,7 +101,7 @@ export default function AdminProfile() {
             alt="Admin"
             className="w-32 h-32 rounded-full object-cover border"
           />
-          <span className="text-sm text-gray-500">{admin.role}</span>
+          <span className="text-sm text-gray-500">Administration</span>
         </div>
 
         {/* INFO */}
