@@ -13,6 +13,8 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { imageUpload } from "../../../../utils";
 import axios from "axios";
+import InvoicePDF from "../../../components/Shared/InvoicePDF/InvoicePdf";
+import { PDFDownloadLink } from "@react-pdf/renderer";
 
 export default function UserProfile() {
   const axiosSecure = useAxiosSecure();
@@ -25,12 +27,15 @@ export default function UserProfile() {
   const { data = [], isLoading: userDataLoading } = useQuery({
     queryKey: ["userProfile", userDetail?.email],
     queryFn: async () => {
-      const res = await axiosSecure(`/api/users?email=${userDetail?.email}&role=citizen`);
+      const res = await axiosSecure(
+        `/api/users?email=${userDetail?.email}&role=citizen`
+      );
       return res.data;
     },
   });
 
-  const user = data?.[0];
+  const user = data.result?.[0];
+  const payment = data.boosted;
 
   const openModal = () => {
     setFormData({
@@ -172,6 +177,17 @@ export default function UserProfile() {
                 Account Status: {user.isPremium ? "Premium User" : "Free User"}
               </span>
             </div>
+
+            {/* download invoice pdf */}
+            {payment && (
+              <PDFDownloadLink
+                document={<InvoicePDF payment={payment} />}
+                fileName={`Invoice_${payment._id}.pdf`}
+                className="bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 transition cursor-hover"
+              >
+                {({ loading }) => (loading ? "Loading..." : "Download Invoice PDF")}
+              </PDFDownloadLink>
+            )}
           </div>
 
           {/* Subscription Box */}

@@ -10,7 +10,7 @@ import LoadingSpinner from "../../components/Shared/LoadingSpinner";
 import useDebounce from "../../hooks/useDebounce";
 import Heading from "../../components/Shared/Heading";
 
-const categories = ["Road", "Electricity", "Water"];
+const categories = ["Road", "Electricity", "Water", "Waste"];
 const statuses = ["Pending", "In Progress", "Resolved"];
 const priorities = ["High", "Normal"];
 
@@ -69,7 +69,7 @@ const AllIssues = () => {
         <Heading title={"All Issues"} subtitle={"View and manage all reported civic issues in one place. Use search and filters to quickly find specific problems."} center={true}/>
 
         {/* Filters and Search */}
-        <div className="flex flex-col md:flex-row md:items-center md:gap-4 mb-6">
+        <div className="flex flex-col md:flex-row md:justify-center md:items-center md:gap-4 mb-6">
           {/* Search */}
           <div className="flex items-center mb-4 md:mb-0 max-w-md w-full">
             <FaSearch className="text-gray-400 mr-2" />
