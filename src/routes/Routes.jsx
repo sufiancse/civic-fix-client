@@ -106,7 +106,7 @@ export const router = createBrowserRouter([
 
       // stuff only routes
       {
-        path: "stuff/assigned-issues",
+        path: "staff/assigned-issues",
         element: <AssignedIssues />,
       },
 

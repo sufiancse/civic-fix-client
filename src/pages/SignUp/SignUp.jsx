@@ -42,7 +42,7 @@ const SignUp = () => {
         maxFreeIssues: 3,
         totalIssues: 0,
       };
-      
+
       await saveOrUpdateUser(userData);
 
       // Save username & profile photo
@@ -87,7 +87,9 @@ const SignUp = () => {
       <div className="flex flex-col max-w-md p-6 rounded-md sm:p-10 bg-gray-100 text-gray-900">
         <div className="mb-8 text-center">
           <h1 className="my-3 text-4xl font-bold">Sign Up</h1>
-          <p className="text-sm text-gray-400">Register to submit and track civic issues in your city</p>
+          <p className="text-sm text-gray-400">
+            Register to submit and track civic issues in your city
+          </p>
         </div>
         <form
           onSubmit={handleSubmit(onSubmit)}
@@ -142,7 +144,7 @@ const SignUp = () => {
       bg-gray-100 border border-dashed border-lime-300 rounded-md cursor-pointer
       focus:outline-none focus:ring-2 focus:ring-primary/70 focus:border-primary/700
       py-2"
-                {...register("image",{required: "Image is required"})}
+                {...register("image", { required: "Image is required" })}
               />
               <p className="mt-1 text-xs text-gray-400">
                 PNG, JPG or JPEG (max 2MB)
@@ -154,6 +156,7 @@ const SignUp = () => {
                 </p>
               )}
             </div>
+
             <div>
               <label htmlFor="email" className="block mb-2 text-sm">
                 Email address
@@ -178,6 +181,7 @@ const SignUp = () => {
                 </p>
               )}
             </div>
+
             <div>
               <div className="flex justify-between">
                 <label htmlFor="password" className="text-sm mb-2">
@@ -196,6 +200,12 @@ const SignUp = () => {
                     value: 6,
                     message: "Password must be at least 6 characters",
                   },
+                  pattern: {
+                    value:
+                      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
+                    message:
+                      "Password must include at least one uppercase letter, one lowercase letter, one number, and one special character",
+                  },
                 })}
               />
               {errors.password && (
@@ -209,7 +219,7 @@ const SignUp = () => {
           <div>
             <button
               type="submit"
-              className="bg-primary w-full rounded-md py-3 text-white"
+              className="bg-primary w-full rounded-md py-3 text-white cursor-pointer"
             >
               {loading ? (
                 <TbFidgetSpinner className="animate-spin m-auto" />
@@ -228,7 +238,7 @@ const SignUp = () => {
         </div>
         <div
           onClick={handleGoogleSignIn}
-          className="flex justify-center items-center space-x-2 border m-3 p-2 border-gray-300 border-rounded cursor-pointer"
+          className="flex  justify-center items-center space-x-2 border m-3 p-2 border-gray-300 border-rounded cursor-pointer"
         >
           <FcGoogle size={32} />
 
@@ -238,7 +248,7 @@ const SignUp = () => {
           Already have an account?{" "}
           <Link
             to="/login"
-            className="hover:underline hover:text-primary text-gray-600"
+            className="hover:underline hover:text-primary text-gray-600 cursor-pointer"
           >
             Login
           </Link>

@@ -92,7 +92,15 @@ export default function AllIssues() {
   };
 
   // Sort boosted issues on top
-  const sortedIssues = [...allIssues].sort((a, b) => b.boosted - a.boosted);
+  const sortedIssues = allIssues.sort((a, b) => {
+    // Not Assigned প্রথম
+    if (!a.assignedStaff && b.assignedStaff) return -1;
+    if (a.assignedStaff && !b.assignedStaff) return 1;
+
+    // Priority High -> Low
+    if (a.isBoosted && !b.isBoosted) return -1;
+  if (!a.isBoosted && b.isBoosted) return 1;
+  });
 
   if (isLoading) return <LoadingSpinner />;
 
@@ -138,7 +146,7 @@ export default function AllIssues() {
                 {!issue.assignedStaff && (
                   <button
                     onClick={() => openAssignModal(issue)}
-                    className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg text-sm"
+                    className="cursor-pointer flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg text-sm"
                   >
                     <FaUserPlus /> Assign Staff
                   </button>
@@ -148,7 +156,7 @@ export default function AllIssues() {
                 {issue.status === "Pending" && (
                   <button
                     onClick={() => rejectIssue(issue)}
-                    className="flex items-center gap-1 bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg text-sm"
+                    className="cursor-pointer flex items-center gap-1 bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg text-sm"
                   >
                     <FaTrash /> Reject
                   </button>
@@ -185,14 +193,14 @@ export default function AllIssues() {
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="px-4 py-2 rounded-lg border hover:bg-gray-50"
+                className="cursor-pointer px-4 py-2 rounded-lg border hover:bg-gray-50"
               >
                 Cancel
               </button>
               <button
                 onClick={assignStaff}
                 disabled={!selectedStaff}
-                className={`px-4 py-2 rounded-lg text-white ${
+                className={`px-4 py-2 rounded-lg text-white cursor-pointer  ${
                   selectedStaff
                     ? "bg-blue-600 hover:bg-blue-700"
                     : "bg-gray-300 cursor-not-allowed"

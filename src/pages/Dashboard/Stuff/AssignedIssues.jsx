@@ -44,7 +44,11 @@ export default function AssignedPage() {
     Resolved: ["Closed"],
   };
 
+  // Local state for each row to control dropdown value
+  const [rowStatus, setRowStatus] = useState({});
+
   const handleStatusChange = (id, newStatus) => {
+    setRowStatus((prev) => ({ ...prev, [id]: "" })); // dropdown reset
     statusMutation.mutate({ id, newStatus });
   };
 
@@ -120,12 +124,12 @@ export default function AssignedPage() {
 
               <td className="p-3">{issue.status}</td>
               <td className="p-3">
-                {issue.status === "Rejected"? <span className=" text-red-500 font-bold">Rejected Issue</span> :issue.status !== "Closed" && (
+                {issue.status === "Rejected" ? (
+                  <span className=" text-red-500 font-bold">Rejected Issue</span>
+                ) : issue.status !== "Closed" ? (
                   <select
-                    defaultValue=""
-                    onChange={(e) =>
-                      handleStatusChange(issue._id, e.target.value)
-                    }
+                    value={rowStatus[issue._id] || ""}
+                    onChange={(e) => handleStatusChange(issue._id, e.target.value)}
                     className="border rounded-lg px-2 py-1 text-sm"
                   >
                     <option value="" disabled>
@@ -138,7 +142,7 @@ export default function AssignedPage() {
                       </option>
                     ))}
                   </select>
-                )}
+                ) : null}
               </td>
             </tr>
           ))}

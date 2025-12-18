@@ -223,7 +223,7 @@ export default function IssueDetailsPage() {
                 <div className="flex justify-between items-center mb-2">
                   <span
                     className={`px-2 py-1 rounded-full text-white text-sm ${
-                      item?.status === "Boosted"
+                      item?.status === "Working"?"bg-black":item?.status === "Boosted"
                         ? "bg-primary font-bold"
                         : item?.status === "Rejected"
                         ? "bg-red-500"

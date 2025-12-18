@@ -202,7 +202,7 @@ export default function ManageStaff() {
                 </td>
                 <td className="p-3">{staff.name}</td>
                 <td className="p-3">{staff.email}</td>
-                <td className="p-3">{staff.phone}</td>
+                <td className="p-3">0{staff.phone}</td>
                 <td className="p-3 flex gap-2 mt-3">
                   <button
                     onClick={() => openEditModal(staff)}
@@ -245,7 +245,7 @@ export default function ManageStaff() {
               <div>
                 <p className="font-semibold">{staff.name}</p>
                 <p className="text-sm text-gray-600">{staff.email}</p>
-                <p className="text-sm text-gray-600">{staff.phone}</p>
+                <p className="text-sm text-gray-600">0{staff.phone}</p>
               </div>
             </div>
             <div className="flex gap-2">
@@ -329,7 +329,7 @@ export default function ManageStaff() {
                   type="submit"
                   className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
                 >
-                  Add
+                  Update
                 </button>
               </div>
             </form>

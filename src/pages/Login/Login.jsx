@@ -5,16 +5,34 @@ import useAuth from "../../hooks/useAuth";
 import { FcGoogle } from "react-icons/fc";
 import { TbFidgetSpinner } from "react-icons/tb";
 import { saveOrUpdateUser } from "../../../utils";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
+import { useQuery } from "@tanstack/react-query";
 
 const Login = () => {
-  const { signIn, signInWithGoogle, loading, user, setLoading } = useAuth();
+  const { signIn, signInWithGoogle, user, setLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const axiosSecure = useAxiosSecure();
 
   const from = location.state || "/";
 
-  if (loading) return <LoadingSpinner />;
-  if (user) return <Navigate to={from} replace={true} />;
+  const { data: userData = [] } = useQuery({
+    queryKey: ["login"],
+    queryFn: async () => {
+      const res = await axiosSecure("/api/users");
+      return res.data;
+    },
+  });
+
+
+   if (user) {
+    const currentUser = userData.find(u => u.email === user.email);
+    if (currentUser?.role === "staff") {
+      return <Navigate to="/dashboard/staff/assigned-issues" replace />;
+    } else {
+      return <Navigate to={from} replace />;
+    }
+  }
 
   // form submit handler
   const handleSubmit = async (event) => {
@@ -27,7 +45,15 @@ const Login = () => {
       //User Login
       await signIn(email, password);
 
-      navigate(from, { replace: true });
+      // Role Check
+      const currentUser = userData.find((u) => u.email === email);
+      if (currentUser?.role === "staff") {
+        navigate("/dashboard/staff/assigned-issues", { replace: true });
+      } else {
+        navigate(from, { replace: true }); // citizen or default
+      }
+
+      
       toast.success("Login Successful");
     } catch (err) {
       console.log(err);
@@ -62,6 +88,7 @@ const Login = () => {
       toast.error(err?.message);
     }
   };
+
   return (
     <div className="flex justify-center items-center min-h-screen bg-white">
       <div className="flex flex-col max-w-md p-6 rounded-md sm:p-10 bg-gray-100 text-gray-900">
@@ -114,13 +141,9 @@ const Login = () => {
           <div>
             <button
               type="submit"
-              className="bg-primary w-full rounded-md py-3 text-white"
+              className="bg-primary w-full rounded-md py-3 text-white cursor-pointer"
             >
-              {loading ? (
-                <TbFidgetSpinner className="animate-spin m-auto" />
-              ) : (
-                "Continue"
-              )}
+              Continue
             </button>
           </div>
         </form>

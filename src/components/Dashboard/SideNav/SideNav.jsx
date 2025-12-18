@@ -74,7 +74,7 @@ const SideNav = () => {
       {/*------------------- Staff */}
       <li>
         <NavLink
-          to="/dashboard/stuff/assigned-issues"
+          to="/dashboard/staff/assigned-issues"
           className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
           data-tip="Assigned Issues"
         >
