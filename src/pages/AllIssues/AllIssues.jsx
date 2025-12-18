@@ -7,7 +7,6 @@ import { useQuery } from "@tanstack/react-query";
 import Card from "../../components/Shared/Card/Card";
 import Container from "../../components/Shared/Container";
 import LoadingSpinner from "../../components/Shared/LoadingSpinner";
-import useDebounce from "../../hooks/useDebounce";
 import Heading from "../../components/Shared/Heading";
 
 const categories = ["Road", "Electricity", "Water", "Waste"];
@@ -19,7 +18,6 @@ const AllIssues = () => {
   const [filterStatus, setFilterStatus] = useState("All");
   const [filterPriority, setFilterPriority] = useState("All");
   const [search, setSearch] = useState("");
-  const debouncedSearch = useDebounce(search, 500);
 
   const [currentPage, setCurrentPage] = useState(1);
   const limit = 8;
@@ -28,12 +26,11 @@ const AllIssues = () => {
 
   const {
     data: allIssues = [],
-    isLoading,
     isFetching,
   } = useQuery({
     queryKey: [
       "allReportedIssues",
-      debouncedSearch,
+      search,
       filterCategory,
       filterStatus,
       filterPriority,
@@ -42,7 +39,7 @@ const AllIssues = () => {
     queryFn: async () => {
       const res = await axiosSecure("/api/all-issues", {
         params: {
-          search: debouncedSearch,
+          search,
           category: filterCategory,
           status: filterStatus,
           priority: filterPriority,
@@ -57,9 +54,6 @@ const AllIssues = () => {
 
   const { issues = [], totalPages = 0 } = allIssues;
 
-  if (isLoading && !allIssues?.issues) {
-    return <LoadingSpinner />;
-  }
 
   return (
     <Container>
@@ -137,9 +131,7 @@ const AllIssues = () => {
         </div>
 
         {isFetching && (
-          <div className="text-center text-sm text-gray-400 mb-4">
-            Loading...
-          </div>
+          <LoadingSpinner />
         )}
 
         {/* Issues Grid */}

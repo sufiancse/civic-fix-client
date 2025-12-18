@@ -18,55 +18,63 @@ import {
   Pie,
   Cell,
 } from "recharts";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
+import { useQuery } from "@tanstack/react-query";
+import LoadingSpinner from "../../Shared/LoadingSpinner";
+import useAuth from "../../../hooks/useAuth";
 
-// ---------------- DUMMY DATA ----------------
-const stats = [
-  {
-    title: "Total Issues",
-    value: 128,
-    icon: FaBug,
-    color: "from-blue-500 to-blue-600",
-  },
-  {
-    title: "Pending Issues",
-    value: 42,
-    icon: FaClock,
-    color: "from-yellow-400 to-yellow-500",
-  },
-  {
-    title: "In Progress",
-    value: 31,
-    icon: FaSpinner,
-    color: "from-purple-500 to-purple-600",
-  },
-  {
-    title: "Resolved",
-    value: 55,
-    icon: FaCheckCircle,
-    color: "from-green-500 to-green-600",
-  },
-  {
-    title: "Total Payments",
-    value: "৳ 32,500",
-    icon: FaMoneyBillWave,
-    color: "from-emerald-500 to-emerald-600",
-  },
-];
-
-const barData = [
-  { name: "Pending", count: 42 },
-  { name: "In Progress", count: 31 },
-  { name: "Resolved", count: 55 },
-];
-
-const pieData = [
-  { name: "Pending", value: 42, color: "#FACC15" },
-  { name: "In Progress", value: 31, color: "#8B5CF6" },
-  { name: "Resolved", value: 55, color: "#22C55E" },
-];
-
-// ---------------- COMPONENT ----------------
 export default function UserDashboard() {
+  const axiosSecure = useAxiosSecure();
+  const {user} = useAuth()
+
+  const { data = {}, isLoading } = useQuery({
+    queryKey: ["user-dashboard"],
+    queryFn: async () => {
+      const res = await axiosSecure.get(`/api/user-dashboard?email=${user?.email}`);
+      return res.data;
+    },
+  });
+
+  const stats = [
+    {
+      title: "Total Issues",
+      value: data?.stats?.totalIssues || 0,
+      icon: FaBug,
+      color: "from-blue-500 to-blue-600",
+    },
+    {
+      title: "Pending Issues",
+      value: data?.stats?.pending || 0,
+      icon: FaClock,
+      color: "from-yellow-400 to-yellow-500",
+    },
+    {
+      title: "In Progress",
+      value: data?.stats?.inProgress || 0,
+      icon: FaSpinner,
+      color: "from-purple-500 to-purple-600",
+    },
+    {
+      title: "Resolved",
+      value: data?.stats?.resolved || 0,
+      icon: FaCheckCircle,
+      color: "from-green-500 to-green-600",
+    },
+    {
+      title: "Total Payments",
+      value: `৳ ${data?.stats?.totalPaymentAmount || 0}`,
+      icon: FaMoneyBillWave,
+      color: "from-emerald-500 to-emerald-600",
+    },
+  ];
+
+  const barData = data?.chart?.barData || [];
+  const pieData = data?.chart?.pieData || [];
+
+  if (isLoading) {
+  return <LoadingSpinner />;
+}
+
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
       {/* Header */}
@@ -116,10 +124,7 @@ export default function UserDashboard() {
                 <Tooltip />
                 <Bar dataKey="count" radius={[8, 8, 0, 0]}>
                   {barData.map((_, i) => (
-                    <Cell
-                      key={i}
-                      fill={["#FACC15", "#8B5CF6", "#22C55E"][i]}
-                    />
+                    <Cell key={i} fill={["#FACC15", "#8B5CF6", "#22C55E"][i]} />
                   ))}
                 </Bar>
               </BarChart>

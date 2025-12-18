@@ -1,4 +1,6 @@
 import React from "react";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 import {
   FaTasks,
   FaCheckCircle,
@@ -20,74 +22,74 @@ import {
   BarChart,
   Bar,
 } from "recharts";
+import useAuth from "../../../hooks/useAuth";
 
-// ================= DUMMY DATA =================
-const stats = [
-  {
-    title: "Assigned Issues",
-    value: 24,
-    icon: FaClipboardList,
-    color: "from-blue-500 to-blue-600",
-  },
-  {
-    title: "Resolved Issues",
-    value: 17,
-    icon: FaCheckCircle,
-    color: "from-green-500 to-green-600",
-  },
-  {
-    title: "Today's Tasks",
-    value: 5,
-    icon: FaTasks,
-    color: "from-purple-500 to-purple-600",
-  },
-  {
-    title: "Pending Tasks",
-    value: 7,
-    icon: FaCalendarDay,
-    color: "from-yellow-400 to-yellow-500",
-  },
-];
-
-const activityData = [
-  { day: "Mon", assigned: 4, resolved: 2 },
-  { day: "Tue", assigned: 6, resolved: 4 },
-  { day: "Wed", assigned: 3, resolved: 3 },
-  { day: "Thu", assigned: 8, resolved: 6 },
-  { day: "Fri", assigned: 5, resolved: 2 },
-  { day: "Sat", assigned: 2, resolved: 0 },
-  { day: "Sun", assigned: 1, resolved: 0 },
-];
-
-const taskStatusData = [
-  { name: "Completed", value: 17, color: "#22C55E" },
-  { name: "In Progress", value: 8, color: "#3B82F6" },
-  { name: "Pending", value: 6, color: "#FACC15" },
-];
-
-const priorityData = [
-  { name: "Low", count: 10 },
-  { name: "Medium", count: 9 },
-  { name: "High", count: 5 },
-];
-
-// ================= COMPONENT =================
 export default function StuffDashboard() {
+  const { user } = useAuth();
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["staffDashboard", user?.email],
+    queryFn: async () => {
+      const res = await axios.get(
+        `http://localhost:3000/api/staff-dashboard?email=${user?.email}`
+      );
+      return res.data;
+    },
+  });
+
+  if (isLoading) return <p>Loading...</p>;
+  if (error) return <p>Error loading dashboard.</p>;
+
+  const { stats, charts } = data;
+
+  const statItems = [
+    {
+      title: "Assigned Issues",
+      value: stats.totalAssigned,
+      icon: FaClipboardList,
+      color: "from-blue-500 to-blue-600",
+    },
+    {
+      title: "Resolved Issues",
+      value: stats.resolved,
+      icon: FaCheckCircle,
+      color: "from-green-500 to-green-600",
+    },
+    {
+      title: "In Progress",
+      value: stats.inProgress,
+      icon: FaTasks,
+      color: "from-purple-500 to-purple-600",
+    },
+    {
+      title: "Pending Tasks",
+      value: stats.pending,
+      icon: FaCalendarDay,
+      color: "from-yellow-400 to-yellow-500",
+    },
+    {
+      title: "Today Assigned",
+      value: stats.todayAssigned,
+      icon: FaTasks,
+      color: "from-indigo-500 to-indigo-600",
+    },
+    {
+      title: "Today Pending",
+      value: stats.todayPending,
+      icon: FaCalendarDay,
+      color: "from-red-400 to-red-500",
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-gray-50 px-4 sm:px-6 lg:px-8 py-6">
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
-          Stuff Dashboard Overview
-        </h1>
-        <p className="text-gray-500 text-sm sm:text-base">
-          Monitor your assigned issues, tasks & performance
-        </p>
-      </div>
+      <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6">
+        Staff Dashboard Overview
+      </h1>
 
-      {/* Stat Cards */}
+      {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-        {stats.map((item, i) => {
+        {statItems.map((item, i) => {
           const Icon = item.icon;
           return (
             <div
@@ -113,31 +115,20 @@ export default function StuffDashboard() {
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Line Chart */}
-        <div className="bg-white rounded-2xl shadow-md p-5">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-            <FaChartLine className="text-blue-500" /> Weekly Issue Activity
+        {/* Bar Chart */}
+        <div className="mt-6 bg-white rounded-2xl shadow-md p-5">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">
+            Issue Priority Overview
           </h3>
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={activityData}>
+              <BarChart data={charts.priorityData} barSize={40}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="day" />
+                <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Line
-                  type="monotone"
-                  dataKey="assigned"
-                  stroke="#3B82F6"
-                  strokeWidth={3}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="resolved"
-                  stroke="#22C55E"
-                  strokeWidth={3}
-                />
-              </LineChart>
+                <Bar dataKey="count" radius={[8, 8, 0, 0]} fill="#6366F1" />
+              </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
@@ -152,51 +143,38 @@ export default function StuffDashboard() {
               <PieChart>
                 <Tooltip />
                 <Pie
-                  data={taskStatusData}
+                  data={charts.taskStatusData}
                   dataKey="value"
                   nameKey="name"
                   innerRadius={55}
                   outerRadius={100}
                   paddingAngle={5}
                 >
-                  {taskStatusData.map((entry, index) => (
+                  {charts.taskStatusData.map((entry, index) => (
                     <Cell key={index} fill={entry.color} />
                   ))}
                 </Pie>
               </PieChart>
             </ResponsiveContainer>
           </div>
-          <div className="flex justify-center gap-4 mt-4 flex-wrap">
-            {taskStatusData.map((item, i) => (
-              <div key={i} className="flex items-center gap-2 text-sm">
-                <span
-                  className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: item.color }}
-                />
-                <span className="text-gray-600">
-                  {item.name} ({item.value})
+
+          {/* Legend with title and value */}
+          <div className="flex justify-around mt-4">
+            {charts.taskStatusData.map((entry, index) => (
+              <div key={index} className="flex gap-2 items-center">
+                <div
+                  className="w-4 h-4 mb-1 rounded-full"
+                  style={{ backgroundColor: entry.color }}
+                ></div>
+                <span className="text-sm font-medium text-gray-700">
+                  {entry.name}
+                </span>
+                <span className="text-sm font-bold text-gray-900">
+                  {entry.value}
                 </span>
               </div>
             ))}
           </div>
-        </div>
-      </div>
-
-      {/* Bar Chart - Extra Stats */}
-      <div className="mt-6 bg-white rounded-2xl shadow-md p-5">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">
-          Issue Priority Overview
-        </h3>
-        <div className="h-72">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={priorityData} barSize={40}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="count" radius={[8, 8, 0, 0]} fill="#6366F1" />
-            </BarChart>
-          </ResponsiveContainer>
         </div>
       </div>
     </div>

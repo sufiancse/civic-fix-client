@@ -38,7 +38,7 @@ export default function ReportIssue() {
     queryKey: ["userData", user?.email],
     queryFn: async () => {
       const res = await axiosSecure(`/api/users?email=${user?.email}`);
-      return res.data;
+      return res.data.result;
     },
   });
 

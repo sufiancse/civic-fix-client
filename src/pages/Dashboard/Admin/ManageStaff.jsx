@@ -30,7 +30,7 @@ export default function ManageStaff() {
     queryKey: ["staffList"],
     queryFn: async () => {
       const res = await axiosSecure(`/api/users?role=staff`);
-      return res.data;
+      return res.data.result;
     },
   });
 

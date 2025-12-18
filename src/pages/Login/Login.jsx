@@ -20,7 +20,7 @@ const Login = () => {
     queryKey: ["login"],
     queryFn: async () => {
       const res = await axiosSecure("/api/users");
-      return res.data;
+      return res.data.result;
     },
   });
 

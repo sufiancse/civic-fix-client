@@ -19,7 +19,7 @@ export default function AssignedPage() {
       const res = await axiosSecure(
         `/api/all-issues?assignedStaffEmail=${user?.email}&status=${filterStatus}&priority=${filterPriority}`
       );
-      return res.data;
+      return res.data.issues
     },
   });
 

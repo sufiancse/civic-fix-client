@@ -4,7 +4,7 @@ import { FaSpinner } from "react-icons/fa";
 
 const LoadingSpinner = () => {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-base-200 px-4">
+    <div className="min-h-[50vh] flex flex-col items-center justify-center bg-base-200 px-4">
       
       {/* Spinner Icon */}
       <motion.div

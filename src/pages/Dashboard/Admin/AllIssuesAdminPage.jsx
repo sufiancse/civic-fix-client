@@ -19,7 +19,7 @@ export default function AllIssues() {
     queryKey: ["allIssuesAdminPage"],
     queryFn: async () => {
       const res = await axiosSecure("/api/all-issues");
-      return res.data;
+      return res.data.issues
     },
   });
 

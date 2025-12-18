@@ -12,7 +12,7 @@ export default function ManageUsers() {
     queryKey: ["allUserData"],
     queryFn: async () => {
       const res = await axiosSecure(`/api/users?role=citizen`);
-      return res.data;
+      return res.data.result;
     },
   });
 

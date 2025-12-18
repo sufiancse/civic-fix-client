@@ -28,7 +28,7 @@ export default function MyIssues() {
       const res = await axiosSecure(
         `/api/all-issues?email=${user?.email}&status=${statusFilter}&category=${categoryFilter}`
       );
-      return res.data;
+      return res.data.issues
     },
   });
 

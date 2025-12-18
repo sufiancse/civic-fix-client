@@ -19,8 +19,6 @@ const LatestResolvedIssues = () => {
     },
   });
 
-  console.log(resolvedIssues);
-
   if (isLoading) return <LoadingSpinner />;
 
   return (
@@ -36,17 +34,16 @@ const LatestResolvedIssues = () => {
           <Card key={issue._id} issue={issue} />
         ))}
       </div>
-<div className="text-end mt-10">
-  <Link
-    to="/all-issues"
-    className="inline-flex items-center gap-2 px-3 py-2 border border-primary rounded-md 
+      <div className="text-end mt-10">
+        <Link
+          to="/all-issues"
+          className="inline-flex items-center gap-2 px-3 py-2 border border-primary rounded-md 
                text-primary hover:bg-primary hover:text-white transition"
-  >
-    <span>View All Issues</span>
-    <FaArrowRight className="text-sm" />
-  </Link>
-</div>
-
+        >
+          <span>View All Issues</span>
+          <FaArrowRight className="text-sm" />
+        </Link>
+      </div>
     </Container>
   );
 };

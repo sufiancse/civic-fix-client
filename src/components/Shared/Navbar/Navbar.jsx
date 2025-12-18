@@ -24,7 +24,7 @@ const Navbar = () => {
     },
   });
 
-  const userData = data?.[0];
+  const userData = data?.result?.[0];
 
   const links = (
     <>
