@@ -20,9 +20,22 @@ const AllIssues = () => {
   const axiosSecure = useAxiosSecure();
 
   const { data: allIssues = [] } = useQuery({
-    queryKey: ["allReportedIssues"],
+    queryKey: [
+      "allReportedIssues",
+      search,
+      filterCategory,
+      filterStatus,
+      filterPriority,
+    ],
     queryFn: async () => {
-      const res = await axiosSecure("/api/all-issues");
+      const res = await axiosSecure("/api/all-issues", {
+        params: {
+          search,
+          category: filterCategory,
+          status: filterStatus,
+          priority: filterPriority,
+        },
+      });
       return res.data;
     },
   });
@@ -89,6 +102,14 @@ const AllIssues = () => {
               </option>
             ))}
           </select>
+        </div>
+
+        <div className="w-full text-center mt-10">
+          {!allIssues.length && (
+            <span className="font-semibold text-lg text-gray-400">
+              No issues found
+            </span>
+          )}
         </div>
 
         {/* Issues Grid */}
