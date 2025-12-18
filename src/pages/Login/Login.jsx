@@ -129,7 +129,6 @@ const Login = () => {
                 type="password"
                 name="password"
                 autoComplete="current-password"
-                defaultValue="111111"
                 id="password"
                 required
                 placeholder="*******"

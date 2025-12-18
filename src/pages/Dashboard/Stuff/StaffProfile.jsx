@@ -22,7 +22,7 @@ export default function StaffProfile() {
       const res = await axiosSecure(
         `/api/users?email=${user.email}&role=staff`
       );
-      return res.data;
+      return res.data.result;
     },
   });
 

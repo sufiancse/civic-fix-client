@@ -1,6 +1,5 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import {
   FaTasks,
   FaCheckCircle,
@@ -23,21 +22,24 @@ import {
   Bar,
 } from "recharts";
 import useAuth from "../../../hooks/useAuth";
+import LoadingSpinner from "../../Shared/LoadingSpinner";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
 
 export default function StuffDashboard() {
   const { user } = useAuth();
+  const axiosSecure = useAxiosSecure();
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["staffDashboard", user?.email],
     queryFn: async () => {
-      const res = await axios.get(
-        `http://localhost:3000/api/staff-dashboard?email=${user?.email}`
+      const res = await axiosSecure.get(
+        `/api/staff-dashboard?email=${user?.email}`
       );
       return res.data;
     },
   });
 
-  if (isLoading) return <p>Loading...</p>;
+  if (isLoading) return <LoadingSpinner />;
   if (error) return <p>Error loading dashboard.</p>;
 
   const { stats, charts } = data;

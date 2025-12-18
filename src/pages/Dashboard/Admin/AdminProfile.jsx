@@ -22,7 +22,7 @@ export default function AdminProfile() {
       const res = await axiosSecure(
         `/api/users?email=${user?.email}&role=admin`
       );
-      return res.data;
+      return res.data.result;
     },
   });
 

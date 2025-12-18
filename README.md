@@ -1,16 +1,30 @@
-# React + Vite
+# civicFix
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Website Name:** civicFix  
+**Admin Email:** admin@civicfix.com  
+**Admin Password:** admin@civicfiX1 
+**Live Site URL:** [https://www.civicfix.com](https://www.civicfix.com)
 
-Currently, two official plugins are available:
+## Overview
+civicFix is a web application designed to help citizens report civic issues, track their status, and communicate with local authorities efficiently. It provides a seamless platform for reporting, monitoring, and resolving community problems.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## React Compiler
+- **User Registration & Login:** Users can create an account, log in, and manage their profile.  
+- **Issue Reporting:** Users can report civic issues like potholes, garbage, streetlight problems, etc.  
+- **Upload Photos & Documents:** Users can attach images or documents to support their issue reports.  
+- **Issue Tracking:** Track the status of reported issues in real-time (Pending, In Progress, Resolved).  
+- **Admin Dashboard:** Admins can view, assign, and manage all reported issues from a single dashboard.  
+- **Role-Based Access:** Separate interfaces and permissions for users, admins, and authorities.  
+- **Notifications:** Email or in-app notifications when issue status changes.  
+- **Search & Filter:** Users and admins can search and filter issues by category, status, or date.  
+- **Responsive Design:** Works seamlessly on mobile, tablet, and desktop devices.  
+- **Statistics & Reports:** Dashboard shows charts for resolved, pending, and rejected issues.  
+- **Comment System:** Users can comment on issues for updates or additional information.  
+- **Secure Authentication:** Passwords are encrypted, and sessions are securely managed.  
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Tech Stack
+- **Frontend:** React.js, Tailwind CSS  
+- **Backend:** Node.js, Express.js  
+- **Database:** MongoDB  
+- **Deployment:** Vercel & Firebase

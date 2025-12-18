@@ -12,10 +12,13 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import InvoicePDF from "../../../components/Shared/InvoicePDF/InvoicePdf";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
 
 export default function ViewPayments() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
+
+  const axiosSecure = useAxiosSecure();
 
   // React Query for fetching payments
   const {
@@ -26,9 +29,8 @@ export default function ViewPayments() {
   } = useQuery({
     queryKey: ["payments"],
     queryFn: async () => {
-      const res = await fetch("http://localhost:3000/api/payments");
-      if (!res.ok) throw new Error("Failed to fetch payments");
-      return res.json();
+      const res = await axiosSecure("/api/payments");
+      return res.data;
     },
   });
 
@@ -170,9 +172,7 @@ export default function ViewPayments() {
                       fileName={`Invoice_${p._id}.pdf`}
                       className="bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 transition cursor-hover"
                     >
-                      {({ loading }) =>
-                        loading ? "Loading..." : "Download"
-                      }
+                      {({ loading }) => (loading ? "Loading..." : "Download")}
                     </PDFDownloadLink>
                   </td>
                 </tr>

@@ -19,7 +19,7 @@ export default function AllIssues() {
     queryKey: ["allIssuesAdminPage"],
     queryFn: async () => {
       const res = await axiosSecure("/api/all-issues");
-      return res.data.issues
+      return res.data.allIssues
     },
   });
 
@@ -27,7 +27,7 @@ export default function AllIssues() {
     queryKey: ["staff"],
     queryFn: async () => {
       const res = await axiosSecure(`/api/users?role=staff`);
-      return res.data;
+      return res.data.result;
     },
   });
 

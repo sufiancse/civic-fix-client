@@ -7,7 +7,6 @@ import DashboardLayout from "../layouts/DashboardLayout";
 import MainLayout from "../layouts/MainLayout";
 import { createBrowserRouter } from "react-router";
 import AllIssues from "../pages/AllIssues/AllIssues";
-import LoadingSpinner from "../components/Shared/LoadingSpinner";
 import IssueDetailsPage from "../pages/IssueDetailsPage/IssueDetailsPage";
 import AboutUs from "../pages/AboutUs/AboutUs";
 import ContactUs from "../pages/ContactUs/ContactUs";
@@ -22,6 +21,9 @@ import ReportIssue from "../pages/Dashboard/Citizen/ReportIssue";
 import Profile from "../pages/Dashboard/Common/Profile";
 import PaymentSuccess from "../pages/Payments/PaymentSuccess";
 import BoostPaymentSuccess from "../pages/Payments/BoostPaymentSuccess";
+import StaffRoute from "./StaffRoute";
+import AdminRoute from "./AdminRoute";
+import UserRoute from "./UserRoute";
 
 export const router = createBrowserRouter([
   {
@@ -39,11 +41,11 @@ export const router = createBrowserRouter([
       },
       {
         path: "/issue-details/:id",
-        element: <IssueDetailsPage />,
-      },
-      {
-        path: "/l",
-        element: <LoadingSpinner />,
+        element: (
+          <PrivateRoute>
+            <IssueDetailsPage />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/about-us",
@@ -55,12 +57,20 @@ export const router = createBrowserRouter([
       },
       {
         path: "/payment-success",
-        element: <PaymentSuccess />,
+        element: (
+          <PrivateRoute>
+            <PaymentSuccess />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/issue-boost-payment-success",
-        element: <BoostPaymentSuccess />
-      }
+        element: (
+          <PrivateRoute>
+            <BoostPaymentSuccess />
+          </PrivateRoute>
+        ),
+      },
     ],
   },
   { path: "/login", element: <Login /> },
@@ -89,35 +99,63 @@ export const router = createBrowserRouter([
       // admin only routes
       {
         path: "admin/all-issues",
-        element: <AllIssuesAdminPage />,
+        element: (
+          <AdminRoute>
+            <AllIssuesAdminPage />
+          </AdminRoute>
+        ),
       },
       {
         path: "admin/manage-users",
-        element: <ManageUsers />,
+        element: (
+          <AdminRoute>
+            <ManageUsers />
+          </AdminRoute>
+        ),
       },
       {
         path: "admin/manage-staff",
-        element: <ManageStaff />,
+        element: (
+          <AdminRoute>
+            <ManageStaff />
+          </AdminRoute>
+        ),
       },
       {
         path: "admin/view-payments",
-        element: <ViewPayments />,
+        element: (
+          <AdminRoute>
+            <ViewPayments />
+          </AdminRoute>
+        ),
       },
 
       // stuff only routes
       {
         path: "staff/assigned-issues",
-        element: <AssignedIssues />,
+        element: (
+          <StaffRoute>
+            <AssignedIssues />
+          </StaffRoute>
+        ),
       },
 
       //users only routes
       {
         path: "user/my-issues",
-        element: <MyIssues />,
+        element: (
+          <UserRoute>
+            <MyIssues />
+          </UserRoute>
+        ),
       },
       {
         path: "user/report-issue",
-        element: <ReportIssue />,
+        element: (
+          <UserRoute>
+            <ReportIssue />
+          </UserRoute>
+        ),
       },
     ],
   },
