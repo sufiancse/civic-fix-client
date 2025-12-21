@@ -29,7 +29,7 @@ const LatestResolvedIssues = () => {
         center="true"
       />
 
-      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 md:gap-5">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 md:gap-5">
         {resolvedIssues.map((issue) => (
           <Card key={issue._id} issue={issue} />
         ))}

@@ -21,6 +21,16 @@ export default function IssueDetailsPage() {
 
   const { id } = useParams();
 
+  const { data: userData = [] } = useQuery({
+    queryKey: ["userData", user?.email],
+    queryFn: async () => {
+      const res = await axiosSecure(`/api/users?email=${user?.email}`);
+      return res.data.result;
+    },
+  });
+
+  const isBlocked = userData[0]?.isBlocked;
+
   const {
     data: issueData = [],
     isLoading,
@@ -168,8 +178,19 @@ export default function IssueDetailsPage() {
                 {user?.email === issue?.issueBy &&
                   issue?.status === "Pending" && (
                     <button
-                      onClick={() => setEditingIssue(issue)}
-                      className="flex items-center gap-1 px-4 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-all text-sm font-medium"
+                      onClick={() => {
+                        if (isBlocked) {
+                          return toast.error(
+                            "You are blocked and cannot edit issues.Contact with authority!"
+                          );
+                        }
+                        setEditingIssue(issue);
+                      }}
+                      className={`flex items-center gap-1 px-4 py-2 rounded-md text-white transition-all text-sm font-medium ${
+                        isBlocked
+                          ? "bg-gray-400 cursor-not-allowed"
+                          : "bg-blue-500 hover:bg-blue-600 cursor-pointer"
+                      }`}
                     >
                       <FaEdit /> Edit
                     </button>
@@ -223,7 +244,9 @@ export default function IssueDetailsPage() {
                 <div className="flex justify-between items-center mb-2">
                   <span
                     className={`px-2 py-1 rounded-full text-white text-sm ${
-                      item?.status === "Working"?"bg-black":item?.status === "Boosted"
+                      item?.status === "Working"
+                        ? "bg-black"
+                        : item?.status === "Boosted"
                         ? "bg-primary font-bold"
                         : item?.status === "Rejected"
                         ? "bg-red-500"

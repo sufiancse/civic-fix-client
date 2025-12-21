@@ -56,7 +56,7 @@ const Navbar = () => {
   );
 
   return (
-    <div className="fixed w-full bg-gray-100 z-10 shadow-sm">
+    <div className="fixed w-full bg-gray-100 z-10 shadow-sm z-50">
       <div className="py-4 ">
         <Container>
           <div className="flex flex-row  items-center justify-between gap-3 md:gap-0">
